@@ -1,0 +1,10 @@
+name = Yoast SEO for Drupal
+description = "Adds Yoast SEO page analysis and configuration"
+package = SEO
+core = 7.x
+
+dependencies[] = node
+dependencies[] = metatag
+dependencies[] = path
+
+configure = admin/config/search/yoast
