@@ -232,7 +232,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   // Output the markup for the snippet and overall score above the body field.
   $form['body'][$body_language][0]['yoast_seo'][$langcode]['snippet_analysis'] = array(
     '#weight' => $form['body'][$body_language][0]['#weight'] + 1,
-    '#markup' => '<div id="' . $wrapper_target_id . '"><div id="wpseo_meta"></div><label>' . t('Snippet') . '</label><div id="' . $snippet_target_id . '"></div><label>' . t('Content analysis') . '</label><div id="' . $output_target_id . '"></div></div>',
+    '#markup' => '<div id="' . $wrapper_target_id . '"><div id="wpseo_meta"></div><label>' . t('Snippet editor') . '</label><div id="' . $snippet_target_id . '"></div><label>' . t('Content analysis') . '</label><div id="' . $output_target_id . '"></div></div>',
   );
 
   // Minified JS file.
