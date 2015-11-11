@@ -1,4 +1,4 @@
-\<?php
+<?php
 /**
  * @file
  * Install, update, and uninstall functions for the Yoast SEO for Drupal module.
