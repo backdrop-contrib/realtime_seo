@@ -6,5 +6,9 @@ core = 7.x
 dependencies[] = node
 dependencies[] = metatag
 dependencies[] = path
+dependencies[] = ctools
 
 configure = admin/config/search/yoast
+
+; Views Handlers
+files[] = views/yoast_seo_handler_score.inc

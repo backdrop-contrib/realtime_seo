@@ -38,6 +38,16 @@ function yoast_seo_menu() {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function yoast_seo_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'yoast_seo') . '/views',
+  );
+}
+
+/**
  * Build a FAPI array for editing meta tags.
  *
  * @param array $form
@@ -236,7 +246,10 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   );
 
   // Minified JS file.
-  drupal_add_js(yoast_seo_library_path('js-text-analysis') . '/yoast-seo.min.js', array('type' => 'external', 'scope' => 'footer'));
+  drupal_add_js(yoast_seo_library_path('js-text-analysis') . '/yoast-seo.min.js', array(
+    'type' => 'external',
+    'scope' => 'footer'
+  ));
 
   // Our own JavaScript.
   drupal_add_js(drupal_get_path('module', 'yoast_seo') . '/js/yoast_seo.js');
@@ -465,8 +478,7 @@ function yoast_seo_score_rating($score) {
       break;
   }
   return $score_rate;
-};
-
+}
 
 /**
  * Load SEO info for multiple entities.
@@ -736,8 +748,8 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
         AND (entity_id = :id)
         AND (revision_id = :revision)",
       array(
-        ':type'     => $entity_type,
-        ':id'       => $entity_id,
+        ':type' => $entity_type,
+        ':id' => $entity_id,
         ':revision' => $revision_id,
       ))->fetchAllKeyed();
     foreach ($languages as $oldlang => $empty) {
