@@ -159,3 +159,21 @@ function yoast_seo_install() {
     }
   }
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function yoast_seo_uninstall() {
+  $entity_type = 'node';
+
+  // Delete node entity variable.
+  variable_del('yoast_seo_enable_' . $entity_type);
+
+  // Also delete the variable for each entity bundle.
+  $entity_info = entity_get_info($entity_type);
+  if (!empty($entity_info['bundles'])) {
+    foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
+      variable_del('yoast_seo_enable_' . $entity_type . '__' . $bundle_name);
+    }
+  }
+}

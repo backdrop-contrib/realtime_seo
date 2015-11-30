@@ -774,6 +774,15 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
 }
 
 /**
+ * Implements hook_node_type_delete().
+ *
+ * Remove configuration when the content type is removed.
+ */
+function yoast_seo_node_type_delete($info) {
+  variable_del('yoast_seo_enable_node__' . $info->type);
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Adds extra settings to the node content type edit page.
