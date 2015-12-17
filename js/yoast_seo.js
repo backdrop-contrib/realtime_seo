@@ -175,7 +175,9 @@ YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
  */
 YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
   var listener = function ( ev ) {
-    document.getElementById(target).value = ev.target.innerText;
+    // textContent support for FF and if both innerText and textContent are
+    // undefined we use an empty string.
+    document.getElementById(target).value = (ev.target.innerText || ev.target.textContent || "");
     this.triggerEvent(target);
   }.bind(this);
   document.getElementById(source).addEventListener("blur", listener);
