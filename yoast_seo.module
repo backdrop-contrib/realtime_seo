@@ -127,14 +127,14 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
 
     // Set placeholder tekst if there is a default in metatags and it is a new
     // entity. This means we have some default configuration for the title.
-    if (!empty($form['metatags'][$langcode]['title'])) {
+    if (!empty($form['metatags'][$langcode]['basic']['title'])) {
       // Checking to see if we have to empty the default value or not.
-      if ($form['metatags'][$langcode]['title']['value']['#default_value'] == $metatag_config['title']['value']) {
+      if ($form['metatags'][$langcode]['basic']['title']['value']['#default_value'] == $metatag_config['title']['value']) {
         if ($new_entity) {
-          $form['metatags'][$langcode]['title']['value']['#default_value'] = '';
+          $form['metatags'][$langcode]['basic']['title']['value']['#default_value'] = '';
         }
         else {
-          $form['metatags'][$langcode]['title']['value']['#default_value'] = token_replace($metatag_config['title']['value'], array('node' => $form['#entity']));
+          $form['metatags'][$langcode]['basic']['title']['value']['#default_value'] = token_replace($metatag_config['title']['value'], array('node' => $form['#entity']));
         }
       }
     }
@@ -142,14 +142,14 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     // Set placeholder tekst if there is a default in metatags and it is a new
     // entity. This means we have some default configuration for the
     // description.
-    if (!empty($form['metatags'][$langcode]['description'])) {
+    if (!empty($form['metatags'][$langcode]['basic']['description'])) {
       // Checking to see if we have to empty the default value or not.
-      if ($form['metatags'][$langcode]['description']['value']['#default_value'] == $metatag_config['description']['value']) {
+      if ($form['metatags'][$langcode]['basic']['description']['value']['#default_value'] == $metatag_config['description']['value']) {
         if ($new_entity) {
-          $form['metatags'][$langcode]['description']['value']['#default_value'] = '';
+          $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] = '';
         }
         else {
-          $form['metatags'][$langcode]['description']['value']['#default_value'] = token_replace($metatag_config['description']['value'], array('node' => $form['#entity']));
+          $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] = token_replace($metatag_config['description']['value'], array('node' => $form['#entity']));
         }
       }
     }
@@ -267,7 +267,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   }
 
   // Check if the SEO title field is overwritten.
-  if (!empty($form['metatags'][$langcode]['title']['value']['#default_value'])) {
+  if (!empty($form['metatags'][$langcode]['basic']['title']['value']['#default_value'])) {
     $seo_title_overwritten = TRUE;
   }
   else {
@@ -286,17 +286,17 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     ),
     'defaultText' => array(
       'url' => $default_url,
-      'title' => !empty($form['metatags'][$langcode]['title']['value']['#default_value']) ? $form['metatags'][$langcode]['title']['value']['#default_value'] : '',
+      'title' => !empty($form['metatags'][$langcode]['basic']['title']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['title']['value']['#default_value'] : '',
       'keyword' => !empty($form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#default_value']) ? $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#default_value'] : '',
-      'meta' => !empty($form['metatags'][$langcode]['description']['value']['#default_value']) ? $form['metatags'][$langcode]['description']['value']['#default_value'] : '',
+      'meta' => !empty($form['metatags'][$langcode]['basic']['description']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] : '',
       'body' => !empty($form['body'][$body_language][0]['#default_value']) ? $form['body'][$body_language][0]['#default_value'] : '',
     ),
     'fields' => array(
       'focusKeyword' => $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#id'],
       'seoStatus' => $form['body'][$body_language][0]['yoast_seo'][$langcode]['seo_status']['#attributes']['id'],
-      'pageTitle' => $form['metatags'][$langcode]['title']['value']['#id'],
+      'pageTitle' => $form['metatags'][$langcode]['basic']['title']['value']['#id'],
       'nodeTitle' => $form['title']['#id'],
-      'description' => $form['metatags'][$langcode]['description']['value']['#id'],
+      'description' => $form['metatags'][$langcode]['basic']['description']['value']['#id'],
       'bodyText' => $form['body'][$body_language][0]['value']['#id'],
       'url' => $form['path']['alias']['#id'],
     ),
