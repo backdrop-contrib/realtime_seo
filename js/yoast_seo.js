@@ -308,7 +308,7 @@ YoastSEO_DrupalSource.prototype.bindElementEvents = function() {
  */
 YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
   for (field in this.config.fields) {
-    if (typeof this.config.fields[field] != 'undefined') {
+    if (typeof this.config.fields[field] != 'undefined' && document.getElementById(this.config.fields[field])) {
       document.getElementById(this.config.fields[field]).__refObj = this;
       document.getElementById(this.config.fields[field]).addEventListener("input", this.renewData.bind(this));
     }
