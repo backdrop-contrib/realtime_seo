@@ -84,24 +84,19 @@
               }
             });
 
-            // Check for CKEditor instances, with a max of 2500ms(= 250ms * 10).
-            var maxDetectTries = 10;
-            detectCKEditorInstances(maxDetectTries, DrupalSource);
-
-            // If we have multiple text formats we have to detect the CKEditor
-            // on several occasions.
-            if (settings.yoast_seo.textFormat) {
-              // On text format change detect any CKEditor instances, if
-              // applicable ofcourse.
-              $('#' + settings.yoast_seo.textFormat).change(function() {
-                maxDetectTries = 10;
-                detectCKEditorInstances(maxDetectTries, DrupalSource);
-              });
-
-              // Detect CKEditor on 'switch to rich text editor' link click.
-              $('#' + settings.yoast_seo.textFormat).siblings('.ckeditor_links').click(function() {
-                maxDetectTries = 10;
-                detectCKEditorInstances(maxDetectTries, DrupalSource);
+            if (typeof CKEDITOR !== "undefined") {
+              CKEDITOR.on('instanceReady', function( ev ) {
+                var editor = ev.editor;
+                
+                // Check if this the instance we want to track.
+                if (editor.name == YoastSEO.analyzerArgs.fields.text) {
+                  editor.on('change', function() {
+                    // Let CKEditor handle updating the linked text element.
+                    editor.updateElement();
+                    // Dispatch input event so Yoast SEO knows something changed!
+                    DrupalSource.triggerEvent(editor.name);
+                  });
+                }
               });
             }
           }
@@ -113,32 +108,6 @@
     }
   }
 })(jQuery);
-
-// Simple function to detect CKEditor instances for the body field.
-function detectCKEditorInstances(maxDetectTries, DrupalSource) {
-  var detected = false;
-  if (typeof CKEDITOR != "undefined" && CKEDITOR.instances.length != 0 && maxDetectTries > 0) {
-    if (typeof CKEDITOR.instances[YoastSEO.analyzerArgs.fields.text] != "undefined") {
-      detected = true;
-      // On any change in the CKEditor instance we set the value of
-      // the CKEditor instance back into the textarea. At that point
-      // we also fire a new input event.
-      CKEDITOR.instances[YoastSEO.analyzerArgs.fields.text].on('change', function() {
-        document.getElementById(YoastSEO.analyzerArgs.fields.text).value = CKEDITOR.instances[YoastSEO.analyzerArgs.fields.text].getData();
-        // Dispatch input event so Yoast SEO knows something changed!
-        DrupalSource.triggerEvent(YoastSEO.analyzerArgs.fields.text);
-      });
-    }
-  }
-
-  // Retry if we haven't been able to detect a CKEditor yet.
-  if (!detected && maxDetectTries > 0) {
-    maxDetectTries--;
-    setTimeout(function() {
-      detectCKEditorInstances(maxDetectTries, DrupalSource);
-    }, 250);
-  }
-};
 
 /**
  * Inputgenerator generates a form for use as input.
