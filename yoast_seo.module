@@ -411,6 +411,7 @@ function yoast_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id)
  * Implements hook_theme().
  */
 function yoast_seo_theme(&$existing, &$type, &$theme, &$path) {
+  $theme = array();
   $theme['yoast_newsletter'] = array(
     'template' => 'newsletter',
     'path' => drupal_get_path('module', 'yoast_seo') . '/templates',
