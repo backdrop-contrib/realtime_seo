@@ -239,16 +239,21 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   <span class="score_title">' . t('SEO') . ': <strong>' . $score . '</strong></span>
   </div>';
 
+  // Template for the newsletter.
+  $snippet_tpl = array('#theme' => 'yoast_newsletter');
+  $newsletter_markup = theme($snippet_tpl);
+
   // Output the markup for the snippet and overall score above the body field.
   $form['body'][$body_language][0]['yoast_seo'][$langcode]['snippet_analysis'] = array(
     '#weight' => $form['body'][$body_language][0]['#weight'] + 1,
     '#markup' => '<div id="' . $wrapper_target_id . '"><div id="wpseo_meta"></div><label>' . t('Snippet editor') . '</label><div id="' . $snippet_target_id . '"></div><label>' . t('Content analysis') . '</label><div id="' . $output_target_id . '"></div></div>',
+    '#suffix' => $newsletter_markup,
   );
 
   // Minified JS file.
   drupal_add_js(yoast_seo_library_path('js-text-analysis') . '/yoast-seo.min.js', array(
     'type' => 'external',
-    'scope' => 'footer'
+    'scope' => 'footer',
   ));
 
   // Our own JavaScript.
@@ -400,6 +405,18 @@ function yoast_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id)
       }
     }
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function yoast_seo_theme(&$existing, &$type, &$theme, &$path) {
+  $theme['yoast_newsletter'] = array(
+    'template' => 'newsletter',
+    'path' => drupal_get_path('module', 'yoast_seo') . '/templates',
+  );
+
+  return $theme;
 }
 
 /**

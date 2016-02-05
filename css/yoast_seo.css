@@ -170,4 +170,9 @@
     cursor: text;
     background-color: #bbdefb; }
 
-/*# sourceMappingURL=yoast_seo.css.map */
+.yoast_newsletter_subscription {
+    margin: 20px 20px 0 20px;
+}
+.yoast_newsletter_subscription h3{
+    margin: 0;
+}
