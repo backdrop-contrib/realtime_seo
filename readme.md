@@ -43,7 +43,7 @@ Yoast SEO for Drupal module
 * [Yoast SEO for Drupal](http://drupal.org/project/yoast_seo)
 
 Yoast SEO for Drupal module dependencies:
-* [Metatag](http://drupal.org/project/metatag)
+* [Metatag](http://drupal.org/project/metatag) - requires v7.x-1.7 or newer.
 * Node (Core)
 * Path (Core)
 
