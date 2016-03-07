@@ -377,10 +377,10 @@ function yoast_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id)
     // Add our own CSS.
     drupal_add_css(drupal_get_path('module', 'yoast_seo') . '/css/yoast_seo.css');
 
-    // Get all the current options node nids.
-    $nids = array_keys($form['admin']['nodes']['#options']);
+    if (!empty($form['admin']['nodes']['#options'])) {
+      // Get all the current options node nids.
+      $nids = array_keys($form['admin']['nodes']['#options']);
 
-    if (!empty($nids)) {
       // Add our custom SEO score header to the admin overview.
       $form['admin']['nodes']['#header']['yoast_seo'] = t('SEO score');
 
