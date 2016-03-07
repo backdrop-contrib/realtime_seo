@@ -311,7 +311,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
       'url' => t('example-post'),
     ),
     'SEOTitleOverwritten' => $seo_title_overwritten,
-    'textFormat' => !empty($form['body'][LANGUAGE_NONE][0]['format']['#id']) ? $form['body'][LANGUAGE_NONE][0]['format']['#id'] : '',
+    'textFormat' => !empty($form['body'][$body_language][0]['format']['#id']) ? $form['body'][$body_language][0]['format']['#id'] : '',
     'baseRoot' => $base_root,
   );
 
