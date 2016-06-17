@@ -1,7 +1,6 @@
 /**
  * JavaScript file that handles initializing and firing the Yoast
  * js-text-analysis library.
- * Support YoastSEO.js v1.2.2.
  */
 (function ($) {
   Drupal.yoast_seo = Drupal.yoast_seo || {};
@@ -28,12 +27,12 @@
               snippet: settings.yoast_seo.targets.snippet
             },
             snippetFields: {
-              title: "snippet-editor-title",
-              url: "snippet-editor-slug",
-              meta: "snippet-editor-meta-description"
+              title: "snippet_title",
+              url: "snippet_cite",
+              meta: "snippet_meta"
             },
             sampleText: {
-              baseUrl: settings.yoast_seo.baseRoot + '/',
+              url: settings.yoast_seo.defaultText.url,
               title: settings.yoast_seo.defaultText.title,
               keyword: settings.yoast_seo.defaultText.keyword,
               meta: settings.yoast_seo.defaultText.meta,
@@ -64,8 +63,9 @@
             // Declaring the callback functions, for now we bind DrupalSource.
             YoastSEO.analyzerArgs.callbacks = {
               getData: DrupalSource.getData.bind(DrupalSource),
+              getAnalyzerInput: DrupalSource.getAnalyzerInput.bind(DrupalSource),
               bindElementEvents: DrupalSource.bindElementEvents.bind(DrupalSource),
-              saveSnippetData: DrupalSource.saveSnippetData.bind(DrupalSource),
+              updateSnippetValues: DrupalSource.updateSnippetValues.bind(DrupalSource),
               saveScores: DrupalSource.saveScores.bind(DrupalSource)
             };
 
@@ -119,6 +119,7 @@ YoastSEO_DrupalSource = function(args) {
   this.config = args;
   this.refObj = {};
   this.analyzerData = {};
+  this.formattedData = {};
 };
 
 /**
@@ -134,7 +135,7 @@ YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
   else {
     document.getElementById(field).fireEvent("input");
   }
-};
+}
 
 /**
  * Parses the input in snippet preview fields on input evt to data in the metatag and path fields
@@ -145,11 +146,11 @@ YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
   var listener = function ( ev ) {
     // textContent support for FF and if both innerText and textContent are
     // undefined we use an empty string.
-    document.getElementById(target).value = (ev.target.value || "");
+    document.getElementById(target).value = (ev.target.innerText || ev.target.textContent || "");
     this.triggerEvent(target);
   }.bind(this);
   document.getElementById(source).addEventListener("blur", listener);
-};
+}
 
 
 /**
@@ -163,6 +164,7 @@ YoastSEO_DrupalSource.prototype.getData = function() {
     meta: this.getDataFromInput( "meta" ),
     snippetMeta: this.getDataFromInput( "meta" ),
     text: this.getDataFromInput( "text" ),
+    snippetTitle: this.getDataFromInput( "title" ),
     pageTitle: this.getDataFromInput( "title" ),
     baseUrl: this.config.baseRoot + '/',
     url: this.config.baseRoot + '/' + this.getDataFromInput( "url" ),
@@ -173,11 +175,29 @@ YoastSEO_DrupalSource.prototype.getData = function() {
   if (data.meta == '') {
     data.snippetMeta = this.config.placeholderText.description;
   }
+  if (data.pageTitle == '') {
+    data.snippetTitle = this.config.placeholderText.title;
+  }
   if (data.snippetCite == '') {
     data.snippetCite = this.config.placeholderText.url;
   }
 
   return data;
+};
+
+/**
+ * Initializes the snippetPreview if it isn't there.
+ * If it is already initialized, it get's new values from the inputs and rerenders snippet.
+ */
+YoastSEO_DrupalSource.prototype.getAnalyzerInput = function() {
+  if (typeof YoastSEO.app.snippetPreview === "undefined") {
+    YoastSEO.app.init();
+  }
+  else {
+    this.updateRawData();
+    YoastSEO.app.reloadSnippetText();
+  }
+  YoastSEO.app.runAnalyzerCallback();
 };
 
 YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
@@ -195,6 +215,7 @@ YoastSEO_DrupalSource.prototype.updateRawData = function() {
     snippetMeta: this.getDataFromInput( "meta" ),
     text: this.getDataFromInput( "text" ),
     nodeTitle: this.getDataFromInput( "nodeTitle" ),
+    snippetTitle: this.getDataFromInput( "title" ),
     pageTitle: this.getDataFromInput( "title" ),
     baseUrl: this.config.baseRoot + '/',
     url: this.config.baseRoot + '/' + this.getDataFromInput( "url" ),
@@ -223,6 +244,28 @@ YoastSEO_DrupalSource.prototype.updateRawData = function() {
 };
 
 /**
+ * when the snippet is updated, set this data in rawData.
+ * @param {string} value
+ * @param {string} type
+ */
+YoastSEO_DrupalSource.prototype.setRawData = function( value, type ) {
+  switch ( type ) {
+    case 'snippet_meta':
+      this.parseSnippetData(type, this.config.fields.meta);
+      YoastSEO.app.rawData.snippetMeta = value;
+      break;
+    case 'snippet_cite':
+      YoastSEO.app.rawData.snippetCite = value;
+      break;
+    case 'snippet_title':
+      YoastSEO.app.rawData.snippetTitle = value;
+      break;
+    default:
+      break;
+  }
+};
+
+/**
  * Calls the eventbinders.
  */
 YoastSEO_DrupalSource.prototype.bindElementEvents = function() {
@@ -242,7 +285,7 @@ YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
 };
 
 /**
- * Calls getAnalyzerinput function on change event from element
+ * calls getAnalyzerinput function on change event from element
  * @param event
  */
 YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
@@ -250,30 +293,23 @@ YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
     this.config.SEOTitleOverwritten = true;
   }
 
-  // @TODO: implement snippetPreview rebuild
-  if (ev.target.id == this.config.fields.title) {
-    document.getElementById(this.config.snippetFields.title).value = ev.target.value;
-    this.triggerEvent(this.config.snippetFields.title);
-  }
-
-  if (ev.target.id == this.config.fields.meta) {
-    document.getElementById(this.config.snippetFields.meta).value = ev.target.value;
-    this.triggerEvent(this.config.snippetFields.meta);
-  }
-
-  if (ev.target.id == this.config.fields.url) {
-    document.getElementById(this.config.snippetFields.url).value = ev.target.value;
-    this.triggerEvent(this.config.snippetFields.url);
-  }
-
+  YoastSEO.app.analyzeTimer(ev);
 };
 
 /**
- * Save the snippet values, but in reality we ignore this.
+ * Updates the snippet values, but in reality we ignore this.
  *
  * @param {Object} ev
  */
-YoastSEO_DrupalSource.prototype.saveSnippetData = function (ev) {
+YoastSEO_DrupalSource.prototype.updateSnippetValues = function( ev ) {
+};
+
+/**
+ * calles getAnalyzerinput function on focus of the snippet elements;
+ * @param event
+ */
+YoastSEO_DrupalSource.prototype.snippetCallback = function( ev ) {
+  this.getAnalyzerInput();
 };
 
 /**
