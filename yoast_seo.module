@@ -459,7 +459,7 @@ function yoast_seo_get_score($entity_id) {
 }
 
 /**
- * Custom function to build up score div, same as in scoreFormatter.js.
+ * Custom function to build up score div, same as in scoreToRating.js.
  *
  * @param int $score
  *   The score of the node.
@@ -470,31 +470,22 @@ function yoast_seo_get_score($entity_id) {
 function yoast_seo_score_rating($score) {
   $score_rate = '';
 
-  switch ($score) {
-    case '0':
-      $score_rate = "na";
-      break;
-
-    case '4':
-    case '5':
-      $score_rate = "poor";
-      break;
-
-    case '6':
-    case '7':
-      $score_rate = "ok";
-      break;
-
-    case '8':
-    case '9':
-    case '10':
-      $score_rate = "good";
-      break;
-
-    default:
-      $score_rate = "bad";
-      break;
+  if ($score <= 4) {
+    $score_rate = "bad";
   }
+
+  if ($score > 4 && $score <= 7) {
+    $score_rate = "ok";
+  }
+
+  if ($score > 7) {
+    $score_rate = "good";
+  }
+
+  if ($score == 0) {
+    $score_rate = "na";
+  }
+
   return $score_rate;
 }
 
