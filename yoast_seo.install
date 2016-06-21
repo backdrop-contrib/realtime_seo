@@ -46,7 +46,7 @@ function yoast_seo_schema() {
       ),
       'seo_status' => array(
         'description' => 'The SEO status in points.',
-        'type' => 'int',
+        'type' => 'float',
         'unsigned' => FALSE,
       ),
     ),
@@ -109,4 +109,16 @@ function yoast_seo_uninstall() {
       variable_del('yoast_seo_enable_' . $entity_type . '__' . $bundle_name);
     }
   }
+}
+
+/**
+ * Change yoast_seo field scheme type from 'int' to 'float'.
+ */
+function yoast_seo_update_7000() {
+  db_drop_primary_key('yoast_seo');
+  db_change_field('yoast_seo', 'seo_status', 'seo_status',
+    array(
+      'type' => 'float',
+      'unsigned' => FALSE,
+    ));
 }
