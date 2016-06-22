@@ -64,10 +64,10 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     if (!empty($form['#entity'])) {
       $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
     }
+  }
 
-    if (empty($langcode)) {
-      $langcode = LANGUAGE_NONE;
-    }
+  if (empty($langcode)) {
+    $langcode = LANGUAGE_NONE;
   }
 
   // Merge in the default options.
@@ -105,7 +105,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
 
   // Making sure we have the necessary form elements and we have access to the
   // form elements. Otherwise we're executing code we'll never use.
-  if (!empty($form['yoast_seo']['#access']) && !empty($form['path']['#access']) && !empty($form['body']['#access']) && !empty($form['metatags']['#access'])) {
+  if (_yoast_check_fields_access($form)) {
     $metatag_config = metatag_config_load_with_defaults($options['instance']);
     $new_entity = empty($form['#entity']->nid) ? TRUE : FALSE;
 
@@ -165,6 +165,37 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
 }
 
 /**
+ * Actually we need access to all fields listed or selected
+ * @param array $form
+ * @return bool
+ */
+function _yoast_check_fields_access(array $form) {
+  $return = array();
+  $bundle = $form['#bundle'];
+  $required_fields = array(
+    'yoast_seo',
+    'path',
+    'metatags',
+  );
+  $fields = variable_get('yoast_seo_body_fields_' . $bundle, array());
+  $default_fields = array_merge($required_fields, $fields);
+
+  if (isset($form['body'])) {
+    $return[] = $form['body']['#access'];
+  }
+  elseif (empty($fields)) {
+    // We don't have body and fields selected.
+    $return[] = FALSE;
+  }
+
+  foreach ($default_fields as $field) {
+    $return[] = !empty($form[$field]['#access']);
+  }
+
+  return array_sum($return) === count($return);
+}
+
+/**
  * Form API submission callback.
  *
  * Moving submitted values back into the metatag fields.
@@ -208,20 +239,14 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     if (!empty($form['#entity'])) {
       $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
     }
-
-    if (empty($langcode)) {
-      $langcode = LANGUAGE_NONE;
-    }
   }
 
-  // We use the language of the body element so we know where to add the
-  // correct yoast_seo settings / fields and elements.
-  $body_language = $form['body']['#language'];
+  if (empty($langcode)) {
+    $langcode = LANGUAGE_NONE;
+  }
 
-  // Lets try to put the container in the body element.
-  $form['body'][$body_language][0]['yoast_seo'] = $form['yoast_seo'];
-  $form['body'][$body_language][0]['yoast_seo']['#weight'] = $form['body'][$body_language][0]['#weight'] + 0.1;
-  unset($form['yoast_seo']);
+  // Lets put the container in the bottom of page, above additional_settings tabs.
+  $form['yoast_seo']['#weight'] = $form['additional_settings']['#weight'] - 2;
 
   // Generate unique HTML IDs.
   $wrapper_target_id = drupal_html_id('yoast-wrapper');
@@ -231,10 +256,10 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   $score = !empty($form['yoast_seo'][$langcode]['seo_status']['#value']) ? yoast_seo_score_rating($form['yoast_seo'][$langcode]['seo_status']['#value']) : yoast_seo_score_rating(0);
 
   // Add the Yoast SEO title before the wrapper.
-  $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Yoast SEO for Drupal') . '</h3>';
+  $form['yoast_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Yoast SEO for Drupal') . '</h3>';
 
   // Output the overall score next to the focus keyword.
-  $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#suffix'] = '<div id="yoast-overallscore" class="overallScore ' . $score . '">
+  $form['yoast_seo'][$langcode]['focus_keyword']['#suffix'] = '<div id="yoast-overallscore" class="overallScore ' . $score . '">
   <div class="score_circle"></div>
   <span class="score_title">' . t('SEO') . ': <strong>' . $score . '</strong></span>
   </div>';
@@ -244,8 +269,8 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   $newsletter_markup = theme($snippet_tpl);
 
   // Output the markup for the snippet and overall score above the body field.
-  $form['body'][$body_language][0]['yoast_seo'][$langcode]['snippet_analysis'] = array(
-    '#weight' => $form['body'][$body_language][0]['#weight'] + 1,
+  $form['yoast_seo'][$langcode]['snippet_analysis'] = array(
+    '#weight' => $form['yoast_seo']['#weight'] - 1,
     '#markup' => '<div id="' . $wrapper_target_id . '"><div id="wpseo_meta"></div><label>' . t('Snippet editor') . '</label><div id="' . $snippet_target_id . '"></div><label>' . t('Content analysis') . '</label><div id="' . $output_target_id . '"></div></div>',
     '#suffix' => $newsletter_markup,
   );
@@ -272,11 +297,25 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   }
 
   // Check if the SEO title field is overwritten.
+  $seo_title_overwritten = FALSE;
   if (!empty($form['metatags'][$langcode]['basic']['title']['value']['#default_value'])) {
     $seo_title_overwritten = TRUE;
   }
-  else {
-    $seo_title_overwritten = FALSE;
+
+  // Collect all body fields and field id's
+  $text_content = array();
+  if (isset($form['body'])) {
+    // We use the language of the body element so we know where to add the
+    // correct yoast_seo settings / fields and elements.
+    $body_language = $form['body']['#language'];
+    $text_content += _yoast_seo_process_field($form['body'][$body_language]);
+  }
+
+  $yoast_fields = variable_get('yoast_seo_body_fields_' . $form['#bundle'], array());
+  foreach ($yoast_fields as $yoast_field) {
+    // We use the language of the field element
+    $field_language = $form[$yoast_field]['#language'];
+    $text_content += _yoast_seo_process_field($form[$yoast_field][$field_language]);
   }
 
   // Create the configuration we will sent to the content analysis library.
@@ -292,17 +331,17 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     'defaultText' => array(
       'url' => $default_url,
       'title' => !empty($form['metatags'][$langcode]['basic']['title']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['title']['value']['#default_value'] : '',
-      'keyword' => !empty($form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#default_value']) ? $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#default_value'] : '',
+      'keyword' => !empty($form['yoast_seo'][$langcode]['focus_keyword']['#default_value']) ? $form['yoast_seo'][$langcode]['focus_keyword']['#default_value'] : '',
       'meta' => !empty($form['metatags'][$langcode]['basic']['description']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] : '',
-      'body' => !empty($form['body'][$body_language][0]['#default_value']) ? $form['body'][$body_language][0]['#default_value'] : '',
+      'body' => trim(implode(PHP_EOL, $text_content)),
     ),
     'fields' => array(
-      'focusKeyword' => $form['body'][$body_language][0]['yoast_seo'][$langcode]['focus_keyword']['#id'],
-      'seoStatus' => $form['body'][$body_language][0]['yoast_seo'][$langcode]['seo_status']['#attributes']['id'],
+      'focusKeyword' => $form['yoast_seo'][$langcode]['focus_keyword']['#id'],
+      'seoStatus' => $form['yoast_seo'][$langcode]['seo_status']['#attributes']['id'],
       'pageTitle' => $form['metatags'][$langcode]['basic']['title']['value']['#id'],
       'nodeTitle' => $form['title']['#id'],
       'description' => $form['metatags'][$langcode]['basic']['description']['value']['#id'],
-      'bodyText' => $form['body'][$body_language][0]['value']['#id'],
+      'bodyText' => array_keys($text_content),
       'url' => $form['path']['alias']['#id'],
     ),
     'placeholderText' => array(
@@ -311,7 +350,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
       'url' => t('example-post'),
     ),
     'SEOTitleOverwritten' => $seo_title_overwritten,
-    'textFormat' => !empty($form['body'][$body_language][0]['format']['#id']) ? $form['body'][$body_language][0]['format']['#id'] : '',
+    'textFormat' => !empty($form['body'][$langcode][0]['format']['#id']) ? $form['body'][$langcode][0]['format']['#id'] : '',
     'baseRoot' => $base_root,
   );
 
@@ -323,6 +362,35 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   drupal_add_js(array('yoast_seo' => $configuration), 'setting');
 
   return $form;
+}
+
+/**
+ * Helper function that extracts field values and id's
+ *
+ * @param array $field
+ * @return array
+ */
+function _yoast_seo_process_field(array $field) {
+  $fields_content = array();
+  if ((int) $field['#cardinality'] === 1) {
+    // Single filed
+    // Store the id of field, it can be filled later and we need them for js.
+    $fields_content[$field[0]['value']['#id']] = '';
+    if (isset($field[0]['value']['#default_value']) && !empty($field[0]['value']['#default_value'])) {
+      $fields_content[$field[0]['value']['#id']] = $field[0]['value']['#default_value'];
+    }
+  }
+  else {
+    // Multi field
+    for ($i = 0; $i <= $field['#max_delta']; $i++) {
+      $fields_content[$field[$i]['value']['#id']] = '';
+      if (isset($field[$i]['value']['#default_value']) && !empty($field[$i]['value']['#default_value'])) {
+        $fields_content[$field[$i]['value']['#id']] = $field[$i]['value']['#default_value'];
+      }
+    }
+  }
+
+  return $fields_content;
 }
 
 /**
@@ -811,38 +879,8 @@ function yoast_seo_node_type_delete($info) {
  * Adds extra settings to the node content type edit page.
  */
 function yoast_seo_form_node_type_form_alter(&$form, $form_state) {
-  if (isset($form['type'])) {
-    $form['yoast_seo'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Yoast SEO for Drupal settings'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-      '#group' => 'additional_settings',
-    );
-
-    // Get the fields belonging to this content type. Let's check if we have a
-    // body field. This is necessary for Yoast SEO for Drupal to work.
-    $fields = field_info_instances('node', $form['#node_type']->type);
-
-    if (!isset($fields['body']) && !empty($form['#node_type']->type)) {
-      $default = FALSE;
-      $description = t('Yoast SEO for Drupal cannot be enabled, because this content type does not have a body field. Add a body field !url.', array('!url' => l(t('here'), 'admin/structure/types/manage/' . $form['#node_type']->type . '/fields')));
-      $disabled = TRUE;
-    }
-    else {
-      $default = variable_get('yoast_seo_enable_node__' . $form['#node_type']->type, TRUE);
-      $description = t('Enable Yoast SEO for Drupal for this content type.');
-      $disabled = FALSE;
-    }
-
-    $form['yoast_seo']['yoast_seo_enable_node_'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable'),
-      '#default_value' => $default,
-      '#disabled' => $disabled,
-      '#description' => $description,
-    );
-  }
+  form_load_include($form_state, 'inc', 'yoast_seo', 'includes/yoast_seo.forms');
+  _yoast_seo_process_node_settings_form($form);
 }
 
 /**

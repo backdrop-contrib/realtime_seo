@@ -87,15 +87,18 @@
             if (typeof CKEDITOR !== "undefined") {
               CKEDITOR.on('instanceReady', function( ev ) {
                 var editor = ev.editor;
-                
-                // Check if this the instance we want to track.
-                if (editor.name == YoastSEO.analyzerArgs.fields.text) {
-                  editor.on('change', function() {
-                    // Let CKEditor handle updating the linked text element.
-                    editor.updateElement();
-                    // Dispatch input event so Yoast SEO knows something changed!
-                    DrupalSource.triggerEvent(editor.name);
-                  });
+                for (var text_field in YoastSEO.analyzerArgs.fields.text) {
+                  // Check if this the instance we want to track.
+                  if (typeof YoastSEO.analyzerArgs.fields.text[text_field] != 'undefined') {
+                    if (editor.name == YoastSEO.analyzerArgs.fields.text[text_field]) {
+                      editor.on('change', function() {
+                        // Let CKEditor handle updating the linked text element.
+                        editor.updateElement();
+                        // Dispatch input event so Yoast SEO knows something changed!
+                        DrupalSource.triggerEvent(editor.name);
+                      });
+                    }
+                  }
                 }
               });
             }
@@ -185,15 +188,31 @@ YoastSEO_DrupalSource.prototype.getData = function() {
 };
 
 YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
-  return document.getElementById(this.config.fields[field]).value;
-}
+  // If this is an array of id's
+  if (this.config.fields[field] instanceof Array) {
+    var output = [];
+    for (var text_field in this.config.fields[field]) {
+      if (
+        typeof this.config.fields[field][text_field] != 'undefined'
+        && document.getElementById(this.config.fields[field][text_field])
+        && document.getElementById(this.config.fields[field][text_field]).value != ''
+      ) {
+        output.push(document.getElementById(this.config.fields[field][text_field]).value);
+      }
+    }
+
+    return output.join("\n");
+  }else{
+    return document.getElementById(this.config.fields[field]).value;
+  }
+};
 
 /**
  * Grabs data from the refObj and returns populated analyzerData
  * @returns analyzerData
  */
 YoastSEO_DrupalSource.prototype.updateRawData = function() {
-  data = {
+  var data = {
     keyword: this.getDataFromInput( "keyword" ),
     meta: this.getDataFromInput( "meta" ),
     snippetMeta: this.getDataFromInput( "meta" ),
@@ -238,6 +257,14 @@ YoastSEO_DrupalSource.prototype.bindElementEvents = function() {
  */
 YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
   for (field in this.config.fields) {
+    if (this.config.fields[field] instanceof Array) {
+      for (var text_field in this.config.fields[field]) {
+        if (typeof this.config.fields[field][text_field] != 'undefined' && document.getElementById(this.config.fields[field][text_field])) {
+          document.getElementById(this.config.fields[field][text_field]).__refObj = this;
+          document.getElementById(this.config.fields[field][text_field]).addEventListener("input", this.renewData.bind(this));
+        }
+      }
+    }
     if (typeof this.config.fields[field] != 'undefined' && document.getElementById(this.config.fields[field])) {
       document.getElementById(this.config.fields[field]).__refObj = this;
       document.getElementById(this.config.fields[field]).addEventListener("input", this.renewData.bind(this));
@@ -311,9 +338,7 @@ YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
     scoreRate = "na";
   }
 
-  var output = Drupal.t("SEO: <strong>" + scoreRate + "</strong>");
-
-  return output;
+  return Drupal.t("SEO: <strong>" + scoreRate + "</strong>");
 };
 
 /**
