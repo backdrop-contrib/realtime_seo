@@ -142,7 +142,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     // Set placeholder tekst if there is a default in metatags and it is a new
     // entity. This means we have some default configuration for the
     // description.
-    if (!empty($form['metatags'][$langcode]['basic']['description'])) {
+    if (!empty($form['metatags'][$langcode]['basic']['description']) && isset($metatag_config['description'])) {
       // Checking to see if we have to empty the default value or not.
       if ($form['metatags'][$langcode]['basic']['description']['value']['#default_value'] == $metatag_config['description']['value']) {
         if ($new_entity) {
