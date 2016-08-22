@@ -203,7 +203,8 @@ YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
 
     return output.join("\n");
   }else{
-    return document.getElementById(this.config.fields[field]).value;
+    var fieldElem = document.getElementById(this.config.fields[field]);
+    return (fieldElem !== null) ? fieldElem.value : '';
   }
 };
 
