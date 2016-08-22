@@ -59,53 +59,54 @@ function yoast_seo_views_api() {
  *   - token types: An array of token types to be passed to theme_token_tree().
  */
 function yoast_seo_configuration_form(array &$form, $instance, array $options = array()) {
-  // Work out the language code to use, default to NONE.
-  if (!empty($form['#entity_type'])) {
-    if (!empty($form['#entity'])) {
-      $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
-    }
-  }
-
-  if (empty($langcode)) {
-    $langcode = LANGUAGE_NONE;
-  }
-
-  // Merge in the default options.
-  $options += array(
-    'instance' => $instance,
-  );
-
-  $form['yoast_seo'] = array(
-    '#type' => 'container',
-    '#title' => t('Yoast SEO'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#multilingual' => TRUE,
-    '#tree' => TRUE,
-    '#access' => (user_access('use yoast seo') || user_access('administer yoast seo')) && (user_access('edit meta tags') || user_access('administer meta tags')) && (user_access('create url aliases') || user_access('administer url aliases')),
-    '#weight' => 35,
-    '#language' => $langcode,
-    '#attributes' => array(
-      'class' => array('yoast-seo-form'),
-    ),
-  );
-  $form['yoast_seo'][$langcode] = array(
-    '#type' => 'container',
-    '#multilingual' => TRUE,
-    '#tree' => TRUE,
-  );
-
-  // Only support vertical tabs if there is a vertical tab element.
-  foreach (element_children($form) as $key) {
-    if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {
-      $form['yoast_seo']['#group'] = $key;
-      break;
-    }
-  }
-
   // Making sure we have the necessary form elements and we have access to the
   // form elements. Otherwise we're executing code we'll never use.
-  if (_yoast_check_fields_access($form)) {
+  if (!empty($form['path']['#access']) && !empty($form['metatags']['#access']) && (user_access('use yoast seo') || user_access('administer yoast seo'))) {
+
+    // Work out the language code to use, default to NONE.
+    if (!empty($form['#entity_type'])) {
+      if (!empty($form['#entity'])) {
+        $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
+      }
+
+      if (empty($langcode)) {
+        $langcode = LANGUAGE_NONE;
+      }
+    }
+
+    // Merge in the default options.
+    $options += array(
+      'instance' => $instance,
+    );
+
+    $form['yoast_seo'] = array(
+      '#type' => 'container',
+      '#title' => t('Yoast SEO'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#multilingual' => TRUE,
+      '#tree' => TRUE,
+      '#weight' => 35,
+      '#language' => $langcode,
+      '#attributes' => array(
+        'class' => array('yoast-seo-form'),
+      ),
+    );
+
+    $form['yoast_seo'][$langcode] = array(
+      '#type' => 'container',
+      '#multilingual' => TRUE,
+      '#tree' => TRUE,
+    );
+
+    // Only support vertical tabs if there is a vertical tab element.
+    foreach (element_children($form) as $key) {
+      if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {
+        $form['yoast_seo']['#group'] = $key;
+        break;
+      }
+     }
+
     $metatag_config = metatag_config_load_with_defaults($options['instance']);
     $new_entity = empty($form['#entity']->nid) ? TRUE : FALSE;
 
