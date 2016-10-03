@@ -1,6 +1,6 @@
 <?php
 
-class yoast_seo_handler_score extends views_handler_field {
+class yoast_seo_handler_rating extends views_handler_field {
   /**
    * @inheritdoc
    */
