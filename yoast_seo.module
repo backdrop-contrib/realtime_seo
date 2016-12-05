@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Primary hook implementations for Yoast SEO for Drupal module.
@@ -105,7 +106,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
         $form['yoast_seo']['#group'] = $key;
         break;
       }
-     }
+    }
 
     $metatag_config = metatag_config_load_with_defaults($options['instance']);
     $new_entity = empty($form['#entity']->nid) ? TRUE : FALSE;
@@ -166,8 +167,10 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
 }
 
 /**
- * Actually we need access to all fields listed or selected
+ * Actually we need access to all fields listed or selected.
+ *
  * @param array $form
+ *
  * @return bool
  */
 function _yoast_check_fields_access(array $form) {
@@ -246,7 +249,8 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     $langcode = LANGUAGE_NONE;
   }
 
-  // Lets put the container in the bottom of page, above additional_settings tabs.
+  // Lets put the container in the bottom of page, above additional_settings
+  // tabs.
   $form['yoast_seo']['#weight'] = $form['additional_settings']['#weight'] - 2;
 
   // Generate unique HTML IDs.
@@ -298,7 +302,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     $seo_title_overwritten = TRUE;
   }
 
-  // Collect all body fields and field id's
+  // Collect all body fields and field id's.
   $text_content = array();
   if (isset($form['body'])) {
     // We use the language of the body element so we know where to add the
@@ -309,7 +313,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
 
   $yoast_fields = variable_get('yoast_seo_body_fields_' . $form['#bundle'], array());
   foreach ($yoast_fields as $yoast_field) {
-    // We use the language of the field element
+    // We use the language of the field element.
     $field_language = $form[$yoast_field]['#language'];
     $text_content += _yoast_seo_process_field($form[$yoast_field][$field_language]);
   }
@@ -361,9 +365,10 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
 }
 
 /**
- * Helper function that extracts field values and id's
+ * Helper function that extracts field values and id's.
  *
  * @param array $field
+ *
  * @return array
  */
 function _yoast_seo_process_field(array $field) {
@@ -377,7 +382,7 @@ function _yoast_seo_process_field(array $field) {
     }
   }
   else {
-    // Multi field
+    // Multi field.
     for ($i = 0; $i <= $field['#max_delta']; $i++) {
       $fields_content[$field[$i]['value']['#id']] = '';
       if (isset($field[$i]['value']['#default_value']) && !empty($field[$i]['value']['#default_value'])) {
@@ -892,7 +897,7 @@ function yoast_seo_entity_supports_yoast_seo($entity_type = NULL, $bundle = NULL
         //
         // // Disable metatags for file_entity.
         // $conf['metatag_enable_file'] = FALSE;
-        //
+        // .
         // @see Settings page.
         if (variable_get('yoast_seo_enable_' . $entity_name, FALSE) == FALSE) {
           $entity_types[$entity_name] = FALSE;

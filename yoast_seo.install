@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Install, update, and uninstall functions for the Yoast SEO for Drupal module.
@@ -51,7 +52,7 @@ function yoast_seo_schema() {
       ),
     ),
     'indexes' => array(
-      'type_revision' => array('entity_type','revision_id'),
+      'type_revision' => array('entity_type', 'revision_id'),
     ),
     'primary key' => array(
       'entity_type',

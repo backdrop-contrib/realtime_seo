@@ -1,13 +1,14 @@
 <?php
+
 /**
- * @file yoast.forms.inc
+ * @file
  * Contains node form alters.
  */
 
 /**
  * Adds extra settings to the node content type edit page.
  *
- * @param $form
+ * @param array $form
  *   Node settings form.
  */
 function _yoast_seo_process_node_settings_form(&$form) {
@@ -38,8 +39,9 @@ function _yoast_seo_process_node_settings_form(&$form) {
       }
     }
 
-    /**
-     * @todo remove this after https://www.drupal.org/node/1149078 was fixed and use
+    /*
+     * @todo remove this after https://www.drupal.org/node/1149078 was fixed
+     * and use
      * $states = array(
      * 'disabled' => array(
      * ':input[name=yoast_seo_body_fields[]]' => array('value' => array('0')),
@@ -61,13 +63,13 @@ function _yoast_seo_process_node_settings_form(&$form) {
       $disabled = TRUE;
       $states = array(
         'enabled' => array(
-          $conditions
+          $conditions,
         ),
       );
     }
     else {
       if (isset($fields['body'])) {
-        // if we have body we skip conditions
+        // If we have body we skip conditions.
         $conditions = array();
       }
       $default = variable_get('yoast_seo_enable_node__' . $node_type, TRUE);
@@ -75,7 +77,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
       $disabled = FALSE;
       $states = array(
         'enabled' => array(
-          $conditions
+          $conditions,
         ),
       );
     }
@@ -89,10 +91,11 @@ function _yoast_seo_process_node_settings_form(&$form) {
       '#states' => $states,
     );
 
-
-    /**
-     * Here we allow users to use different fields or multiple for using instead of body.
-     * @todo change this to multiselect after https://www.drupal.org/node/1149078 was fixed
+    /*
+     * Here we allow users to use different fields or multiple for using
+     * instead of body.
+     * @todo change this to multiselect after
+     * https://www.drupal.org/node/1149078 was fixed
      * '#type' => 'select',
      * '#multiple' => TRUE,
      */

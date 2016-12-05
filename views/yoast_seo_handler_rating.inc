@@ -1,17 +1,25 @@
 <?php
 
+/**
+ * @file
+ */
+
+/**
+ * View handler class yoast_seo_handler_rating.
+ */
 class yoast_seo_handler_rating extends views_handler_field {
+
   /**
    * @inheritdoc
    */
-  function query() {
+  public function query() {
     $this->ensure_my_table();
   }
 
   /**
    * Renders the field handler.
    */
-  function render($values) {
+  public function render($values) {
     $output = '';
 
     if (user_access('use yoast seo')) {
@@ -36,4 +44,5 @@ class yoast_seo_handler_rating extends views_handler_field {
 
     return $output;
   }
+
 }
