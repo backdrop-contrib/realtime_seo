@@ -1,5 +1,5 @@
-name = Yoast SEO for Drupal
-description = "Adds Yoast SEO page analysis and configuration"
+name = Realtime SEO for Drupal
+description = "Adds Realtime SEO page analysis and configuration"
 package = SEO
 core = 7.x
 

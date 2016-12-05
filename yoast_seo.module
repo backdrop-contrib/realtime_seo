@@ -9,13 +9,13 @@
  */
 function yoast_seo_permission() {
   $permissions['administer yoast seo'] = array(
-    'title' => t('Administer Yoast SEO for Drupal'),
+    'title' => t('Administer Realtime SEO for Drupal'),
     'restrict access' => TRUE,
     'description' => t('Control the main settings pages and configure the settings per content types.'),
   );
   $permissions['use yoast seo'] = array(
-    'title' => t('Use Yoast SEO for Drupal'),
-    'description' => t('Modify Yoast SEO for Drupal configuration per individual nodes.'),
+    'title' => t('Use Realtime SEO for Drupal'),
+    'description' => t('Modify Realtime SEO for Drupal configuration per individual nodes.'),
   );
 
   return $permissions;
@@ -26,8 +26,8 @@ function yoast_seo_permission() {
  */
 function yoast_seo_menu() {
   $items['admin/config/search/yoast'] = array(
-    'title' => 'Yoast SEO for Drupal',
-    'description' => 'Configure Yoast SEO for Drupal settings',
+    'title' => 'Realtime SEO for Drupal',
+    'description' => 'Configure Realtime SEO for Drupal settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('yoast_seo_admin_settings_form'),
     'access arguments' => array('administer yoast seo'),
@@ -81,7 +81,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
 
     $form['yoast_seo'] = array(
       '#type' => 'container',
-      '#title' => t('Yoast SEO'),
+      '#title' => t('Realtime SEO'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#multilingual' => TRUE,
@@ -257,7 +257,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   $score = !empty($form['yoast_seo'][$langcode]['seo_status']['#value']) ? yoast_seo_score_rating($form['yoast_seo'][$langcode]['seo_status']['#value']) : yoast_seo_score_rating(0);
 
   // Add the Yoast SEO title before the wrapper.
-  $form['yoast_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Yoast SEO for Drupal') . '</h3>';
+  $form['yoast_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Realtime SEO for Drupal') . '</h3>';
 
   // Output the overall score next to the focus keyword.
   $form['yoast_seo'][$langcode]['focus_keyword']['#suffix'] = '<div id="yoast-overallscore" class="overallScore ' . $score . '">
@@ -561,7 +561,7 @@ function yoast_seo_configuration_load_multiple($entity_type, array $entity_ids, 
   // Also need to check if the Yoast SEO table exists since this condition could
   // fire before the table has been installed yet.
   if (!db_table_exists('yoast_seo')) {
-    watchdog('yoast_seo', 'The system tried to load Yoast SEO for Drupal data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
+    watchdog('yoast_seo', 'The system tried to load Realtime SEO for Drupal data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
     return array();
   }
 

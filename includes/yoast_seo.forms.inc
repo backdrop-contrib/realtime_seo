@@ -16,7 +16,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
   if (isset($form['type'])) {
     $form['yoast_seo'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Yoast SEO for Drupal settings'),
+      '#title' => t('Realtime SEO for Drupal settings'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#group' => 'additional_settings',
@@ -57,7 +57,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
     $body_fields = variable_get('yoast_seo_body_fields_' . $node_type, array());
     if (!isset($fields['body']) && !empty($node_type) && empty($body_fields)) {
       $default = FALSE;
-      $description = t('Yoast SEO for Drupal cannot be enabled, because this content type does not have a body field. Add a body field !url.', array('!url' => l(t('here'), 'admin/structure/types/manage/' . $form['#node_type']->type . '/fields')));
+      $description = t('Realtime SEO for Drupal cannot be enabled, because this content type does not have a body field. Add a body field !url.', array('!url' => l(t('here'), 'admin/structure/types/manage/' . $form['#node_type']->type . '/fields')));
       $disabled = TRUE;
       $states = array(
         'enabled' => array(
@@ -71,7 +71,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
         $conditions = array();
       }
       $default = variable_get('yoast_seo_enable_node__' . $node_type, TRUE);
-      $description = t('Enable Yoast SEO for Drupal for this content type.');
+      $description = t('Enable Realtime SEO for Drupal for this content type.');
       $disabled = FALSE;
       $states = array(
         'enabled' => array(
@@ -100,7 +100,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
       $description = t('There is no filed that can be used as additional field.');
     }
     else {
-      $description = t('Select fields to use instead or in addition to body for Yoast SEO. Access to all fields must be allowed.');
+      $description = t('Select fields to use instead or in addition to body for Realtime SEO. Access to all fields must be allowed.');
     }
 
     $form['yoast_seo']['yoast_seo_body']['yoast_seo_body_fields'] = array(
