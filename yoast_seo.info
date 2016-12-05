@@ -1,5 +1,5 @@
-name = Realtime SEO for Drupal
-description = "Adds Realtime SEO page analysis and configuration"
+name = Real-time SEO for Drupal
+description = "Adds Real-time SEO page analysis and configuration"
 package = SEO
 core = 7.x
 

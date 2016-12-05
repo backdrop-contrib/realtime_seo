@@ -1,8 +1,8 @@
-Realtime SEo for Drupal
+Real-time SEo for Drupal
 ---------------------------
 Improve your Drupal SEO: Write better content and have a fully optimized Drupal content using Realtime SEO for Drupal module.
 
-This module is written from the ground up by [GoalGorilla](http://www.goalgorilla.com) to improve your site's SEO on *all* needed aspects. The [Realtime SEO for Drupal module](http://drupal.org/project/yoast_seo/) is heavily dependending on the [Yoast](http://www.yoast.com) library and [Metatag](http://drupal.org/project/metatag) module . Together they go the extra mile to take care of a lot technical optimization, more on that below, but it first and foremost helps you write better content. Realtime SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere.
+This module is written from the ground up by [GoalGorilla](http://www.goalgorilla.com) to improve your site's SEO on *all* needed aspects. The [Real-time SEO for Drupal module](http://drupal.org/project/yoast_seo/) is heavily dependending on the [Yoast](http://www.yoast.com) library and [Metatag](http://drupal.org/project/metatag) module . Together they go the extra mile to take care of a lot technical optimization, more on that below, but it first and foremost helps you write better content. Realtime SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere.
 
 
 
@@ -40,7 +40,7 @@ Please use the Drupal issue lists to report bugs or discuss ideas on improving t
 References
 ------------------------------------------------------------------------------
 Realtime SEO for Drupal module
-* [Realtime SEO for Drupal](http://drupal.org/project/yoast_seo)
+* [Real-time SEO for Drupal](http://drupal.org/project/yoast_seo)
 
 Realtime SEO for Drupal module dependencies:
 * [Metatag](http://drupal.org/project/metatag) - requires v7.x-1.7 or newer.

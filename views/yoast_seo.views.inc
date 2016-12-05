@@ -17,7 +17,7 @@ function yoast_seo_views_data() {
       'base' => array(
         'field' => 'entity_id',
         'title' => t('Entity ID'),
-        'help' => t('The Entity ID the Realtime SEO data is attached to.'),
+        'help' => t('The Entity ID the Real-time SEO data is attached to.'),
       ),
       'join' => array(
         'node' => array(
@@ -28,7 +28,7 @@ function yoast_seo_views_data() {
     ),
     'entity_id' => array(
       'title' => t('Entity ID'),
-      'help' => t('The Entity ID the Realtime SEO data is attached to.'),
+      'help' => t('The Entity ID the Real-time SEO data is attached to.'),
       'relationship' => array(
         'base' => 'node',
         'field' => 'nid',
@@ -52,7 +52,7 @@ function yoast_seo_views_data() {
     ),
     'seo_status' => array(
       'title' => t('SEO Score'),
-      'help' => t('Realtime SEO Score represented as a numeric value.'),
+      'help' => t('Real-time SEO Score represented as a numeric value.'),
       'field' => array(
         'handler' => 'views_handler_field_numeric',
         'click sortable' => TRUE,
@@ -66,7 +66,7 @@ function yoast_seo_views_data() {
     ),
     'seo_rating' => array(
       'title' => t('SEO Rating'),
-      'help' => t('Realtime SEO Rating represented using a traffic light system.'),
+      'help' => t('Real-time SEO Rating represented using a traffic light system.'),
       'field' => array(
         'handler' => 'yoast_seo_handler_rating',
       ),
