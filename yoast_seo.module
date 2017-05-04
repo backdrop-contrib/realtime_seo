@@ -100,6 +100,13 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
       '#tree' => TRUE,
     );
 
+    // Put Yoast in a vertical tab if setting is set.
+    $yoast_seo_vertical_tab = variable_get('yoast_seo_vertical_tab');
+
+    if (!empty($yoast_seo_vertical_tab)) {
+      $form['yoast_seo']['#type'] = 'fieldset';
+    }
+
     // Only support vertical tabs if there is a vertical tab element.
     foreach (element_children($form) as $key) {
       if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {

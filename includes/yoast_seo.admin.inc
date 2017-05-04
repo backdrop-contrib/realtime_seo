@@ -50,5 +50,15 @@ function yoast_seo_admin_settings_form() {
     '#markup' => $metatag_description,
   );
 
-  return $form;
+  // Allow the Real-Time SEO Module to be displayed in a tab at the bottom of
+  // the edit page.
+  $form['yoast_seo_vertical_tab'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display in vertical tab'),
+    '#description' => t('Put Real-Time SEO Module in a vertical tab on content edit forms.'),
+    '#default_value' => variable_get('yoast_seo_vertical_tab', FALSE),
+  );
+
+  // Let Drupal save our checkbox as a system variable.
+  return system_settings_form($form);
 }
