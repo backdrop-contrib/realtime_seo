@@ -158,7 +158,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
           $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] = $metatag_config['description']['value'];
         }
         else {
-          $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] = token_replace($metatag_config['description']['value'], array('node' => $form['#entity']));
+          $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] = strip_tags(token_replace($metatag_config['description']['value'], array('node' => $form['#entity'])));
         }
       }
     }
