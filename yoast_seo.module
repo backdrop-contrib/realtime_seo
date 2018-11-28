@@ -67,7 +67,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     // Work out the language code to use, default to NONE.
     if (!empty($form['#entity_type'])) {
       if (!empty($form['#entity'])) {
-        $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
+        $langcode = $form['#entity']->langcode;
       }
 
       if (empty($langcode)) {
@@ -213,7 +213,7 @@ function _yoast_check_fields_access(array $form) {
  */
 function yoast_seo_configuration_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['metatags'])) {
-    $langcode = $form_state['values']['language'];
+    $langcode = $form_state['values']['langcode'];
 
     // Moving the title field value.
     if (isset($form_state['values']['metatags'][$langcode]['title']['value']) && isset($form_state['values']['metatags'][$langcode]['title']['default'])) {
@@ -248,7 +248,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   // yoast_seo settings per language and for metatags..
   if (!empty($form['#entity_type'])) {
     if (!empty($form['#entity'])) {
-      $langcode = entity_language($form['#entity_type'], (object) $form['#entity']);
+      $langcode = $form['#entity']->langcode;
     }
   }
 
@@ -418,7 +418,8 @@ function yoast_seo_field_attach_form($entity_type, $entity, &$form, &$form_state
 
   $instance = "{$entity_type}:{$bundle}";
 
-  $options['token types'] = array(token_get_entity_mapping('entity', $entity_type));
+  $token_info = token_get_info();
+  $options['token types'] = isset($token_info['tokens'][$entity_type]) ? $token_info['tokens'][$entity_type] : array();
   $options['context'] = $entity_type;
   // Allow hook_metatag_token_types_alter() to modify the defined tokens. We do
   // this because we are using metatags own fields.
@@ -674,7 +675,7 @@ function yoast_seo_entity_insert($entity, $entity_type) {
     $revision_id = intval($revision_id);
 
     // Determine the entity's language.
-    $langcode = entity_language($entity_type, $entity);
+    $langcode = $entity->langcode;
 
     // Unfortunately due to how core works, the normal entity_language()
     // function returns 'und' instead of the node's language during node
@@ -716,7 +717,7 @@ function yoast_seo_entity_update($entity, $entity_type) {
     // Determine the entity's new language. This will always be accurate as the
     // language value will already have been updated by the time this function
     // executes, and it will be loaded for the correct edit process.
-    $new_language = entity_language($entity_type, (object) $entity);
+    $new_language = $entity->langcode;
 
     if (empty($new_language)) {
       $new_language = LANGUAGE_NONE;

@@ -1,12 +1,13 @@
 name = Real-time SEO for Drupal
 description = "Adds Real-time SEO page analysis and configuration"
+type = module
 package = SEO
-core = 7.x
+backdrop = 1.x
 
 ; These are provided by core.
 dependencies[] = node
 dependencies[] = path
-dependencies[] = ctools
+;dependencies[] = ctools
 
 ; A newer version of Metatag is required due to internal API changes.
 dependencies[] = metatag (>= 1.7)
