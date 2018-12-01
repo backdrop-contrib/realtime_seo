@@ -11,13 +11,13 @@
  * @param array $form
  *   Node settings form.
  */
-function _yoast_seo_process_node_settings_form(&$form) {
+function _realtime_seo_process_node_settings_form(&$form) {
 
   // Do not process node form if it do not contain node type.
   if (isset($form['type'])) {
-    $form['yoast_seo'] = array(
+    $form['realtime_seo'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Real-time SEO for Drupal settings'),
+      '#title' => t('Real-time SEO for Backdrop settings'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#group' => 'additional_settings',
@@ -26,7 +26,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
     $node_type = $form['#node_type']->type;
 
     // Get the fields belonging to this content type. Let's check if we have a
-    // body field. This is necessary for Yoast SEO for Drupal to work.
+    // body field. This is necessary for Realtime SEO for Backdrop to work.
     $fields = field_info_instances('node', $node_type);
     // Collect all text fields.
     $text_fields = array(0 => t('- None -'));
@@ -44,7 +44,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
      * and use
      * $states = array(
      * 'disabled' => array(
-     * ':input[name=yoast_seo_body_fields[]]' => array('value' => array('0')),
+     * ':input[name=realtime_seo_body_fields[]]' => array('value' => array('0')),
      * ),
      * );
      */
@@ -53,13 +53,13 @@ function _yoast_seo_process_node_settings_form(&$form) {
     unset($text_fields[0]);
     $field_names = array_keys($text_fields);
     foreach ($field_names as $label) {
-      $conditions[][':input[name="yoast_seo_body_fields[' . $label . ']"]'] = array('checked' => TRUE);
+      $conditions[][':input[name="realtime_seo_body_fields[' . $label . ']"]'] = array('checked' => TRUE);
     }
 
-    $body_fields = variable_get('yoast_seo_body_fields_' . $node_type, array());
+    $body_fields = variable_get('realtime_seo_body_fields_' . $node_type, array());
     if (!isset($fields['body']) && !empty($node_type) && empty($body_fields)) {
       $default = FALSE;
-      $description = t('Real-time SEO for Drupal cannot be enabled, because this content type does not have a body field. Add a body field !url.', array('!url' => l(t('here'), 'admin/structure/types/manage/' . $form['#node_type']->type . '/fields')));
+      $description = t('Real-time SEO for Backdrop cannot be enabled, because this content type does not have a body field. Add a body field !url.', array('!url' => l(t('here'), 'admin/structure/types/manage/' . $form['#node_type']->type . '/fields')));
       $disabled = TRUE;
       $states = array(
         'enabled' => array(
@@ -72,8 +72,8 @@ function _yoast_seo_process_node_settings_form(&$form) {
         // If we have body we skip conditions.
         $conditions = array();
       }
-      $default = variable_get('yoast_seo_enable_node__' . $node_type, TRUE);
-      $description = t('Enable Real-time SEO for Drupal for this content type.');
+      $default = variable_get('realtime_seo_enable_node__' . $node_type, TRUE);
+      $description = t('Enable Real-time SEO for Backdrop for this content type.');
       $disabled = FALSE;
       $states = array(
         'enabled' => array(
@@ -82,7 +82,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
       );
     }
 
-    $form['yoast_seo']['yoast_seo_enable_node_'] = array(
+    $form['realtime_seo']['realtime_seo_enable_node_'] = array(
       '#type' => 'checkbox',
       '#title' => t('Enable'),
       '#default_value' => $default,
@@ -106,7 +106,7 @@ function _yoast_seo_process_node_settings_form(&$form) {
       $description = t('Select fields to use instead, or in addition to body for Real-time SEO. Access to all fields must be allowed.');
     }
 
-    $form['yoast_seo']['yoast_seo_body']['yoast_seo_body_fields'] = array(
+    $form['realtime_seo']['realtime_seo_body']['realtime_seo_body_fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Additional body source'),
       '#description' => $description,

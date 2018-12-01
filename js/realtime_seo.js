@@ -4,28 +4,28 @@
  * Support YoastSEO.js v1.2.2.
  */
 (function ($) {
-  Drupal.yoast_seo = Drupal.yoast_seo || {};
+  Backdrop.realtime_seo = Backdrop.realtime_seo || {};
 
-  Drupal.behaviors.yoast_seo = {
+  Backdrop.behaviors.realtime_seo = {
     attach: function (context, settings) {
       // Making sure we actually have data.
-      if (typeof settings.yoast_seo != 'undefined') {
+      if (typeof settings.realtime_seo != 'undefined') {
         // Making sure we only initiate Yoast SEO once.
         $('body', context).once('yoast_seo', function() {
           YoastSEO.analyzerArgs = {
-            source: YoastSEO_DrupalSource,
-            analyzer: settings.yoast_seo.analyzer,
-            snippetPreview: settings.yoast_seo.snippetPreview,
-            elementTarget: [settings.yoast_seo.targetId],
+            source: YoastSEO_BackdropSource,
+            analyzer: settings.realtime_seo.analyzer,
+            snippetPreview: settings.realtime_seo.snippetPreview,
+            elementTarget: [settings.realtime_seo.targetId],
             typeDelay: 300,
             typeDelayStep: 100,
             maxTypeDelay: 1500,
             dynamicDelay: true,
             multiKeyword: false,
             targets: {
-              output: settings.yoast_seo.targets.output,
-              overall: settings.yoast_seo.targets.overall,
-              snippet: settings.yoast_seo.targets.snippet
+              output: settings.realtime_seo.targets.output,
+              overall: settings.realtime_seo.targets.overall,
+              snippet: settings.realtime_seo.targets.snippet
             },
             snippetFields: {
               title: "snippet-editor-title",
@@ -33,49 +33,49 @@
               meta: "snippet-editor-meta-description"
             },
             sampleText: {
-              baseUrl: settings.yoast_seo.baseRoot + '/',
-              title: settings.yoast_seo.defaultText.title,
-              keyword: settings.yoast_seo.defaultText.keyword,
-              meta: settings.yoast_seo.defaultText.meta,
-              text: settings.yoast_seo.defaultText.body
+              baseUrl: settings.realtime_seo.baseRoot + '/',
+              title: settings.realtime_seo.defaultText.title,
+              keyword: settings.realtime_seo.defaultText.keyword,
+              meta: settings.realtime_seo.defaultText.meta,
+              text: settings.realtime_seo.defaultText.body
             },
             fields: {
-              keyword: settings.yoast_seo.fields.focusKeyword,
-              title: settings.yoast_seo.fields.pageTitle,
-              nodeTitle: settings.yoast_seo.fields.nodeTitle,
-              meta: settings.yoast_seo.fields.description,
-              text: settings.yoast_seo.fields.bodyText,
-              url: settings.yoast_seo.fields.url
+              keyword: settings.realtime_seo.fields.focusKeyword,
+              title: settings.realtime_seo.fields.pageTitle,
+              nodeTitle: settings.realtime_seo.fields.nodeTitle,
+              meta: settings.realtime_seo.fields.description,
+              text: settings.realtime_seo.fields.bodyText,
+              url: settings.realtime_seo.fields.url
             },
             placeholderText: {
-              title: settings.yoast_seo.placeholderText.title,
-              description: settings.yoast_seo.placeholderText.description,
-              url: settings.yoast_seo.placeholderText.url
+              title: settings.realtime_seo.placeholderText.title,
+              description: settings.realtime_seo.placeholderText.description,
+              url: settings.realtime_seo.placeholderText.url
             },
-            SEOTitleOverwritten: settings.yoast_seo.SEOTitleOverwritten,
-            scoreElement: settings.yoast_seo.fields.seoStatus,
-            baseRoot: settings.yoast_seo.baseRoot
+            SEOTitleOverwritten: settings.realtime_seo.SEOTitleOverwritten,
+            scoreElement: settings.realtime_seo.fields.seoStatus,
+            baseRoot: settings.realtime_seo.baseRoot
           };
 
           // Create a new Yoast SEO instance.
           if (typeof YoastSEO != "undefined") {
-            var DrupalSource = new YoastSEO_DrupalSource(YoastSEO.analyzerArgs);
+            var BackdropSource = new YoastSEO_BackdropSource(YoastSEO.analyzerArgs);
 
-            // Declaring the callback functions, for now we bind DrupalSource.
+            // Declaring the callback functions, for now we bind BackdropSource.
             YoastSEO.analyzerArgs.callbacks = {
-              getData: DrupalSource.getData.bind(DrupalSource),
-              bindElementEvents: DrupalSource.bindElementEvents.bind(DrupalSource),
-              saveSnippetData: DrupalSource.saveSnippetData.bind(DrupalSource),
-              saveScores: DrupalSource.saveScores.bind(DrupalSource)
+              getData: BackdropSource.getData.bind(BackdropSource),
+              bindElementEvents: BackdropSource.bindElementEvents.bind(BackdropSource),
+              saveSnippetData: BackdropSource.saveSnippetData.bind(BackdropSource),
+              saveScores: BackdropSource.saveScores.bind(BackdropSource)
             };
 
             // Make it global.
             window.YoastSEO.app = new YoastSEO.App( YoastSEO.analyzerArgs );
 
             // Parse the input from snippet preview fields to their corresponding metatag and path fields
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title );
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url );
-            DrupalSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta );
+            BackdropSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.title, YoastSEO.analyzerArgs.fields.title );
+            BackdropSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.url, YoastSEO.analyzerArgs.fields.url );
+            BackdropSource.parseSnippetData( YoastSEO.analyzerArgs.snippetFields.meta, YoastSEO.analyzerArgs.fields.meta );
 
             // No enter on contenteditable fields.
             $("#snippet_title, #snippet_cite, #snippet_meta").keypress(function(e) {
@@ -95,7 +95,7 @@
                         // Let CKEditor handle updating the linked text element.
                         editor.updateElement();
                         // Dispatch input event so Yoast SEO knows something changed!
-                        DrupalSource.triggerEvent(editor.name);
+                        BackdropSource.triggerEvent(editor.name);
                       });
                     }
                   }
@@ -104,7 +104,7 @@
             }
           }
           else {
-            $('#' + settings.yoast_seo.targets.output).html('<p><strong>' + Drupal.t('It looks like something went wrong when we tried to load the Yoast SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
+            $('#' + settings.realtime_seo.targets.output).html('<p><strong>' + Backdrop.t('It looks like something went wrong when we tried to load the Yoast SEO content analysis library. Please check it the module is installed correctly.') + '</strong></p>');
           }
         });
       }
@@ -118,7 +118,7 @@
  * @param refObj
  * @constructor
  */
-YoastSEO_DrupalSource = function(args) {
+YoastSEO_BackdropSource = function(args) {
   this.config = args;
   this.refObj = {};
   this.analyzerData = {};
@@ -128,7 +128,7 @@ YoastSEO_DrupalSource = function(args) {
  * Sets field value and dispatches an event to fire content analysis magic
  * @param field
  */
-YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
+YoastSEO_BackdropSource.prototype.triggerEvent = function(field) {
   if ("createEvent" in document) {
     var ev = document.createEvent("HTMLEvents");
     ev.initEvent("input", false, true);
@@ -144,7 +144,7 @@ YoastSEO_DrupalSource.prototype.triggerEvent = function(field) {
  * @param source
  * @param target
  */
-YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
+YoastSEO_BackdropSource.prototype.parseSnippetData = function(source, target) {
   var listener = function ( ev ) {
     // textContent support for FF and if both innerText and textContent are
     // undefined we use an empty string.
@@ -161,7 +161,7 @@ YoastSEO_DrupalSource.prototype.parseSnippetData = function(source, target) {
  * Grabs data from the refObj and returns populated analyzerData
  * @returns analyzerData
  */
-YoastSEO_DrupalSource.prototype.getData = function() {
+YoastSEO_BackdropSource.prototype.getData = function() {
   // Default data in here.
   data = {
     keyword: this.getDataFromInput( "keyword" ),
@@ -189,7 +189,7 @@ YoastSEO_DrupalSource.prototype.getData = function() {
   return data;
 };
 
-YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
+YoastSEO_BackdropSource.prototype.getDataFromInput = function( field ) {
   // If this is an array of id's
   if (this.config.fields[field] instanceof Array) {
     var output = [];
@@ -214,7 +214,7 @@ YoastSEO_DrupalSource.prototype.getDataFromInput = function( field ) {
  * Grabs data from the refObj and returns populated analyzerData
  * @returns analyzerData
  */
-YoastSEO_DrupalSource.prototype.updateRawData = function() {
+YoastSEO_BackdropSource.prototype.updateRawData = function() {
   var data = {
     keyword: this.getDataFromInput( "keyword" ),
     meta: this.getDataFromInput( "meta" ),
@@ -251,14 +251,14 @@ YoastSEO_DrupalSource.prototype.updateRawData = function() {
 /**
  * Calls the eventbinders.
  */
-YoastSEO_DrupalSource.prototype.bindElementEvents = function() {
+YoastSEO_BackdropSource.prototype.bindElementEvents = function() {
   this.inputElementEventBinder();
 };
 
 /**
  * Binds the renewData function on the change of inputelements.
  */
-YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
+YoastSEO_BackdropSource.prototype.inputElementEventBinder = function() {
   for (field in this.config.fields) {
     if (this.config.fields[field] instanceof Array) {
       for (var text_field in this.config.fields[field]) {
@@ -279,7 +279,7 @@ YoastSEO_DrupalSource.prototype.inputElementEventBinder = function() {
  * Calls getAnalyzerinput function on change event from element
  * @param event
  */
-YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
+YoastSEO_BackdropSource.prototype.renewData = function ( ev ) {
   // @TODO: implement snippetPreview rebuild
   if (!this.config.SEOTitleOverwritten && (ev.target.id == this.config.fields.nodeTitle || ev.target.id == this.config.snippetFields.title)) {
     var $this = this;
@@ -314,7 +314,7 @@ YoastSEO_DrupalSource.prototype.renewData = function ( ev ) {
  *
  * @param {Object} ev
  */
-YoastSEO_DrupalSource.prototype.saveSnippetData = function (ev) {
+YoastSEO_BackdropSource.prototype.saveSnippetData = function (ev) {
 };
 
 /**
@@ -322,7 +322,7 @@ YoastSEO_DrupalSource.prototype.saveSnippetData = function (ev) {
  * @param score
  * @returns output
  */
-YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
+YoastSEO_BackdropSource.prototype.scoreRating = function (rating) {
   var scoreRate;
 
   if (rating <= 4) {
@@ -341,14 +341,14 @@ YoastSEO_DrupalSource.prototype.scoreRating = function (rating) {
     scoreRate = "na";
   }
 
-  return Drupal.t("SEO: <strong>" + scoreRate + "</strong>");
+  return Backdrop.t("SEO: <strong>" + scoreRate + "</strong>");
 };
 
 /**
  * Sets the SEO score in the hidden element.
  * @param score
  */
-YoastSEO_DrupalSource.prototype.saveScores = function ( score ) {
+YoastSEO_BackdropSource.prototype.saveScores = function ( score ) {
   var rating = 0;
   if (typeof score == "number" && score > 0) {
     rating = ( score / 10 );

@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Primary hook implementations for Yoast SEO for Drupal module.
+ * Primary hook implementations for Realtime SEO for Backdrop module.
  */
 
 /**
  * Implements hook_permission().
  */
-function yoast_seo_permission() {
-  $permissions['administer yoast seo'] = array(
-    'title' => t('Administer Real-time SEO for Drupal'),
+function realtime_seo_permission() {
+  $permissions['administer realtime seo'] = array(
+    'title' => t('Administer Real-time SEO for Backdrop'),
     'restrict access' => TRUE,
     'description' => t('Control the main settings pages and configure the settings per content types.'),
   );
-  $permissions['use yoast seo'] = array(
-    'title' => t('Use Real-time SEO for Drupal'),
-    'description' => t('Modify Realtime SEO for Drupal configuration per individual nodes.'),
+  $permissions['use realtime seo'] = array(
+    'title' => t('Use Real-time SEO for Backdrop'),
+    'description' => t('Modify Realtime SEO for Backdrop configuration per individual nodes.'),
   );
 
   return $permissions;
@@ -25,14 +25,14 @@ function yoast_seo_permission() {
 /**
  * Implements hook_menu().
  */
-function yoast_seo_menu() {
-  $items['admin/config/search/yoast'] = array(
-    'title' => 'Real-time SEO for Drupal',
-    'description' => 'Configure Real-time SEO for Drupal settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('yoast_seo_admin_settings_form'),
-    'access arguments' => array('administer yoast seo'),
-    'file' => 'includes/yoast_seo.admin.inc',
+function realtime_seo_menu() {
+  $items['admin/config/search/realtime'] = array(
+    'title' => 'Real-time SEO for Backdrop',
+    'description' => 'Configure Real-time SEO for Backdrop settings',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('realtime_seo_admin_settings_form'),
+    'access arguments' => array('administer realtime seo'),
+    'file' => 'includes/realtime_seo.admin.inc',
   );
 
   return $items;
@@ -41,10 +41,16 @@ function yoast_seo_menu() {
 /**
  * Implements hook_views_api().
  */
-function yoast_seo_views_api() {
+function realtime_seo_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'yoast_seo') . '/views',
+    'path' => backdrop_get_path('module', 'realtime_seo') . '/views',
+  );
+}
+
+function realtime_seo_autoload_info() {
+  return array(
+    'realtime_seo_handler_rating' => 'views/realtime_seo_handler_rating.inc',
   );
 }
 
@@ -59,10 +65,10 @@ function yoast_seo_views_api() {
  *   (optional) An array of options including the following keys and values:
  *   - token types: An array of token types to be passed to theme_token_tree().
  */
-function yoast_seo_configuration_form(array &$form, $instance, array $options = array()) {
+function realtime_seo_configuration_form(array &$form, $instance, array $options = array()) {
   // Making sure we have the necessary form elements and we have access to the
   // form elements. Otherwise we're executing code we'll never use.
-  if (!empty($form['path']['#access']) && !empty($form['metatags']['#access']) && (user_access('use yoast seo') || user_access('administer yoast seo'))) {
+  if (!empty($form['path']['#access']) && !empty($form['metatags']['#access']) && (user_access('use realtime seo') || user_access('administer realtime seo'))) {
 
     // Work out the language code to use, default to NONE.
     if (!empty($form['#entity_type'])) {
@@ -80,7 +86,7 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
       'instance' => $instance,
     );
 
-    $form['yoast_seo'] = array(
+    $form['realtime_seo'] = array(
       '#type' => 'container',
       '#title' => t('Real-time SEO'),
       '#collapsible' => TRUE,
@@ -90,27 +96,27 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
       '#weight' => 35,
       '#language' => $langcode,
       '#attributes' => array(
-        'class' => array('yoast-seo-form'),
+        'class' => array('realtime-seo-form'),
       ),
     );
 
-    $form['yoast_seo'][$langcode] = array(
+    $form['realtime_seo'][$langcode] = array(
       '#type' => 'container',
       '#multilingual' => TRUE,
       '#tree' => TRUE,
     );
 
-    // Put Yoast in a vertical tab if setting is set.
-    $yoast_seo_vertical_tab = variable_get('yoast_seo_vertical_tab');
+    // Put Realtime SEO in a vertical tab if setting is set.
+    $realtime_seo_vertical_tab = variable_get('realtime_seo_vertical_tab');
 
-    if (!empty($yoast_seo_vertical_tab)) {
-      $form['yoast_seo']['#type'] = 'fieldset';
+    if (!empty($realtime_seo_vertical_tab)) {
+      $form['realtime_seo']['#type'] = 'fieldset';
     }
 
     // Only support vertical tabs if there is a vertical tab element.
     foreach (element_children($form) as $key) {
       if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {
-        $form['yoast_seo']['#group'] = $key;
+        $form['realtime_seo']['#group'] = $key;
         break;
       }
     }
@@ -119,19 +125,19 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     $new_entity = empty($form['#entity']->nid) ? TRUE : FALSE;
 
     // Add the focus keyword field.
-    $form['yoast_seo'][$langcode]['focus_keyword'] = array(
+    $form['realtime_seo'][$langcode]['focus_keyword'] = array(
       '#type' => 'textfield',
       '#title' => t('Focus keyword'),
       '#description' => t('Pick the main keyword or keyphrase that this post/page is about.'),
-      '#default_value' => !empty($form['#entity']->yoast_seo[$langcode]['focus_keyword']) ? $form['#entity']->yoast_seo[$langcode]['focus_keyword'] : '',
-      '#id' => drupal_html_id('focus-keyword'),
+      '#default_value' => !empty($form['#entity']->realtime_seo[$langcode]['focus_keyword']) ? $form['#entity']->realtime_seo[$langcode]['focus_keyword'] : '',
+      '#id' => backdrop_html_id('focus-keyword'),
     );
 
     // Add the SEO status field.
-    $form['yoast_seo'][$langcode]['seo_status'] = array(
+    $form['realtime_seo'][$langcode]['seo_status'] = array(
       '#type' => 'hidden',
-      '#default_value' => !empty($form['#entity']->yoast_seo[$langcode]['seo_status']) ? $form['#entity']->yoast_seo[$langcode]['seo_status'] : 0,
-      '#attributes' => array('id' => drupal_html_id('seo-status')),
+      '#default_value' => !empty($form['#entity']->realtime_seo[$langcode]['seo_status']) ? $form['#entity']->realtime_seo[$langcode]['seo_status'] : 0,
+      '#attributes' => array('id' => backdrop_html_id('seo-status')),
     );
 
     // Set placeholder tekst if there is a default in metatags and it is a new
@@ -164,12 +170,12 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
     }
 
     // Add a form after build to add the JavaScript.
-    $form['#after_build'][] = 'yoast_seo_configuration_form_after_build';
+    $form['#after_build'][] = 'realtime_seo_configuration_form_after_build';
 
     // Add a submit handler to compare the submitted values against the default
     // values.
     $form += array('#submit' => array());
-    array_unshift($form['#submit'], 'yoast_seo_configuration_form_submit');
+    array_unshift($form['#submit'], 'realtime_seo_configuration_form_submit');
   }
 }
 
@@ -180,15 +186,15 @@ function yoast_seo_configuration_form(array &$form, $instance, array $options = 
  *
  * @return bool
  */
-function _yoast_check_fields_access(array $form) {
+function _realtime_check_fields_access(array $form) {
   $return = array();
   $bundle = $form['#bundle'];
   $required_fields = array(
-    'yoast_seo',
+    'realtime_seo',
     'path',
     'metatags',
   );
-  $fields = variable_get('yoast_seo_body_fields_' . $bundle, array());
+  $fields = variable_get('realtime_seo_body_fields_' . $bundle, array());
   $default_fields = array_merge($required_fields, $fields);
 
   if (isset($form['body'])) {
@@ -211,7 +217,7 @@ function _yoast_check_fields_access(array $form) {
  *
  * Moving submitted values back into the metatag fields.
  */
-function yoast_seo_configuration_form_submit($form, &$form_state) {
+function realtime_seo_configuration_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['metatags'])) {
     $langcode = $form_state['values']['langcode'];
 
@@ -243,9 +249,9 @@ function yoast_seo_configuration_form_submit($form, &$form_state) {
  * At this point we have access to the HTML id's of form elements we need for
  * the JavaScript to function.
  */
-function yoast_seo_configuration_form_after_build($form, &$form_state) {
+function realtime_seo_configuration_form_after_build($form, &$form_state) {
   // Work out the language code to use, default to NONE. This is used on the
-  // yoast_seo settings per language and for metatags..
+  // realtime_seo settings per language and for metatags..
   if (!empty($form['#entity_type'])) {
     if (!empty($form['#entity'])) {
       $langcode = $form['#entity']->langcode;
@@ -258,41 +264,41 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
 
   // Lets put the container in the bottom of page, above additional_settings
   // tabs.
-  $form['yoast_seo']['#weight'] = $form['additional_settings']['#weight'] - 2;
+  $form['realtime_seo']['#weight'] = $form['additional_settings']['#weight'] - 2;
 
   // Generate unique HTML IDs.
-  $wrapper_target_id = drupal_html_id('yoast-wrapper');
-  $output_target_id = drupal_html_id('yoast-output');
-  $overallscore_target_id = drupal_html_id('yoast-overallscore');
-  $snippet_target_id = drupal_html_id('yoast-snippet');
-  $score = !empty($form['yoast_seo'][$langcode]['seo_status']['#value']) ? yoast_seo_score_rating($form['yoast_seo'][$langcode]['seo_status']['#value']) : yoast_seo_score_rating(0);
+  $wrapper_target_id = backdrop_html_id('realtime-wrapper');
+  $output_target_id = backdrop_html_id('realtime-output');
+  $overallscore_target_id = backdrop_html_id('realtime-overallscore');
+  $snippet_target_id = backdrop_html_id('realtime-snippet');
+  $score = !empty($form['realtime_seo'][$langcode]['seo_status']['#value']) ? realtime_seo_score_rating($form['realtime_seo'][$langcode]['seo_status']['#value']) : realtime_seo_score_rating(0);
 
-  // Add the Yoast SEO title before the wrapper.
-  $form['yoast_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Real-time SEO for Drupal') . '</h3>';
+  // Add the Realtime SEO title before the wrapper.
+  $form['realtime_seo'][$langcode]['focus_keyword']['#prefix'] = '<h3 class="wrapper-title">' . t('Real-time SEO for Backdrop') . '</h3>';
 
   // Output the overall score next to the focus keyword.
-  $form['yoast_seo'][$langcode]['focus_keyword']['#suffix'] = '<div id="yoast-overallscore" class="overallScore ' . $score . '">
+  $form['realtime_seo'][$langcode]['focus_keyword']['#suffix'] = '<div id="realtime-overallscore" class="overallScore ' . $score . '">
   <div class="score_circle"></div>
   <span class="score_title">' . t('SEO') . ': <strong>' . $score . '</strong></span>
   </div>';
 
   // Output the markup for the snippet and overall score above the body field.
-  $form['yoast_seo'][$langcode]['snippet_analysis'] = array(
-    '#weight' => $form['yoast_seo']['#weight'] - 1,
+  $form['realtime_seo'][$langcode]['snippet_analysis'] = array(
+    '#weight' => $form['realtime_seo']['#weight'] - 1,
     '#markup' => '<div id="' . $wrapper_target_id . '"><div id="wpseo_meta"></div><label>' . t('Snippet editor') . '</label><div id="' . $snippet_target_id . '"></div><label>' . t('Content analysis') . '</label><div id="' . $output_target_id . '"></div></div>',
   );
 
   // Minified JS file.
-  drupal_add_js(yoast_seo_library_path('js-text-analysis') . '/yoast-seo.min.js', array(
+  backdrop_add_js(realtime_seo_library_path('js-text-analysis') . '/yoast-seo.min.js', array(
     'type' => 'external',
     'scope' => 'footer',
   ));
 
   // Our own JavaScript.
-  drupal_add_js(drupal_get_path('module', 'yoast_seo') . '/js/yoast_seo.js');
+  backdrop_add_js(backdrop_get_path('module', 'realtime_seo') . '/js/realtime_seo.js');
 
   // Our own CSS.
-  drupal_add_css(drupal_get_path('module', 'yoast_seo') . '/css/yoast_seo.css');
+  backdrop_add_css(backdrop_get_path('module', 'realtime_seo') . '/css/realtime_seo.css');
 
   global $base_root;
   $default_url = '';
@@ -313,16 +319,16 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   $text_content = array();
   if (isset($form['body'])) {
     // We use the language of the body element so we know where to add the
-    // correct yoast_seo settings / fields and elements.
+    // correct realtime_seo settings / fields and elements.
     $body_language = $form['body']['#language'];
-    $text_content += _yoast_seo_process_field($form['body'][$body_language]);
+    $text_content += _realtime_seo_process_field($form['body'][$body_language]);
   }
 
-  $yoast_fields = variable_get('yoast_seo_body_fields_' . $form['#bundle'], array());
-  foreach ($yoast_fields as $yoast_field) {
+  $realtime_fields = variable_get('realtime_seo_body_fields_' . $form['#bundle'], array());
+  foreach ($realtime_fields as $realtime_field) {
     // We use the language of the field element.
-    $field_language = $form[$yoast_field]['#language'];
-    $text_content += _yoast_seo_process_field($form[$yoast_field][$field_language]);
+    $field_language = $form[$realtime_field]['#language'];
+    $text_content += _realtime_seo_process_field($form[$realtime_field][$field_language]);
   }
 
   // Create the configuration we will sent to the content analysis library.
@@ -338,13 +344,13 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
     'defaultText' => array(
       'url' => $default_url,
       'title' => !empty($form['metatags'][$langcode]['basic']['title']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['title']['value']['#default_value'] : '',
-      'keyword' => !empty($form['yoast_seo'][$langcode]['focus_keyword']['#default_value']) ? $form['yoast_seo'][$langcode]['focus_keyword']['#default_value'] : '',
+      'keyword' => !empty($form['realtime_seo'][$langcode]['focus_keyword']['#default_value']) ? $form['realtime_seo'][$langcode]['focus_keyword']['#default_value'] : '',
       'meta' => !empty($form['metatags'][$langcode]['basic']['description']['value']['#default_value']) ? $form['metatags'][$langcode]['basic']['description']['value']['#default_value'] : '',
       'body' => trim(implode(PHP_EOL, $text_content)),
     ),
     'fields' => array(
-      'focusKeyword' => $form['yoast_seo'][$langcode]['focus_keyword']['#id'],
-      'seoStatus' => $form['yoast_seo'][$langcode]['seo_status']['#attributes']['id'],
+      'focusKeyword' => $form['realtime_seo'][$langcode]['focus_keyword']['#id'],
+      'seoStatus' => $form['realtime_seo'][$langcode]['seo_status']['#attributes']['id'],
       'pageTitle' => (module_exists('seo_ui')) ? $form['seo_vtab']['metatags_title']['title']['value']['#id'] : $form['metatags'][$langcode]['basic']['title']['value']['#id'],
       'nodeTitle' => $form['title']['#id'],
       'description' => (module_exists('seo_ui')) ? $form['seo_vtab']['metatags'][$langcode]['basic']['description']['value']['#id'] : $form['metatags'][$langcode]['basic']['description']['value']['#id'],
@@ -362,11 +368,11 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
   );
 
   // Allow other modules to alter the configuration we sent to the content
-  // analysis library by implementing hook_yoast_seo_configuration_alter().
-  drupal_alter('yoast_seo_configuration', $configuration);
+  // analysis library by implementing hook_realtime_seo_configuration_alter().
+  backdrop_alter('realtime_seo_configuration', $configuration);
 
   // Add the configuration to the front-end for the content analysis library.
-  drupal_add_js(array('yoast_seo' => $configuration), 'setting');
+  backdrop_add_js(array('realtime_seo' => $configuration), 'setting');
 
   return $form;
 }
@@ -378,7 +384,7 @@ function yoast_seo_configuration_form_after_build($form, &$form_state) {
  *
  * @return array
  */
-function _yoast_seo_process_field(array $field) {
+function _realtime_seo_process_field(array $field) {
   $fields_content = array();
   if ((int) $field['#cardinality'] === 1) {
     // Single filed
@@ -404,7 +410,7 @@ function _yoast_seo_process_field(array $field) {
 /**
  * Implements hook_field_attach_form().
  */
-function yoast_seo_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+function realtime_seo_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
   // Entity_Translation will trigger this hook again, skip it.
   if (!empty($form_state['entity_translation']['is_translation'])) {
     return;
@@ -412,7 +418,7 @@ function yoast_seo_field_attach_form($entity_type, $entity, &$form, &$form_state
 
   list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
 
-  if (!yoast_seo_entity_supports_yoast_seo($entity_type, $bundle)) {
+  if (!realtime_seo_entity_supports_realtime_seo($entity_type, $bundle)) {
     return;
   }
 
@@ -423,9 +429,9 @@ function yoast_seo_field_attach_form($entity_type, $entity, &$form, &$form_state
   $options['context'] = $entity_type;
   // Allow hook_metatag_token_types_alter() to modify the defined tokens. We do
   // this because we are using metatags own fields.
-  drupal_alter('metatag_token_types', $options);
+  backdrop_alter('metatag_token_types', $options);
 
-  $form['#yoast_seo'] = array(
+  $form['#realtime_seo'] = array(
     'instance' => $instance,
     'options' => $options,
   );
@@ -436,11 +442,11 @@ function yoast_seo_field_attach_form($entity_type, $entity, &$form, &$form_state
  *
  * @todo Remove this when https://www.drupal.org/node/1284642 is fixed in core.
  */
-function yoast_seo_form_alter(&$form, $form_state, $form_id) {
-  if (!empty($form['#yoast_seo']) && !isset($form['yoast_seo'])) {
-    extract($form['#yoast_seo']);
-    yoast_seo_configuration_form($form, $instance, $options);
-    unset($form['#yoast_seo']);
+function realtime_seo_form_alter(&$form, $form_state, $form_id) {
+  if (!empty($form['#realtime_seo']) && !isset($form['realtime_seo'])) {
+    extract($form['#realtime_seo']);
+    realtime_seo_configuration_form($form, $instance, $options);
+    unset($form['#realtime_seo']);
   }
 }
 
@@ -449,35 +455,35 @@ function yoast_seo_form_alter(&$form, $form_state, $form_id) {
  *
  * Add the custom Yoast score to the overview if the user has access.
  */
-function yoast_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id) {
-  if (user_access('use yoast seo')) {
+function realtime_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id) {
+  if (user_access('use realtime seo')) {
     // Add our own CSS.
-    drupal_add_css(drupal_get_path('module', 'yoast_seo') . '/css/yoast_seo.css');
+    backdrop_add_css(backdrop_get_path('module', 'realtime_seo') . '/css/realtime_seo.css');
 
     if (!empty($form['admin']['nodes']['#options'])) {
       // Get all the current options node nids.
       $nids = array_keys($form['admin']['nodes']['#options']);
 
       // Add our custom SEO score header to the admin overview.
-      $form['admin']['nodes']['#header']['yoast_seo'] = t('SEO score');
+      $form['admin']['nodes']['#header']['realtime_seo'] = t('SEO score');
 
       // For every result, we fetch the score from the database on nid.
       foreach (entity_load('node', $nids) as $node) {
         list($nid, , $bundle) = entity_extract_ids('node', $node);
 
         // Check if entity has SEO availability otherwise show a message.
-        if (yoast_seo_entity_supports_yoast_seo('node', $bundle)) {
+        if (realtime_seo_entity_supports_realtime_seo('node', $bundle)) {
           // Score will be either 0 or a higher int. 0 is default.
-          $score = yoast_seo_get_score($nid);
+          $score = realtime_seo_get_score($nid);
           // Class will represent classname for current score. Like poor or bad
           // it's used for theming purposes.
-          $class = yoast_seo_score_rating($score);
+          $class = realtime_seo_score_rating($score);
 
           // Add Yoast score to the overview.
-          $form['admin']['nodes']['#options'][$nid]['yoast_seo'] = '<div id="yoast-overallscore" class="overallScore ' . $class . '"><div class="score_circle"></div></div>';
+          $form['admin']['nodes']['#options'][$nid]['realtime_seo'] = '<div id="realtime-overallscore" class="overallScore ' . $class . '"><div class="score_circle"></div></div>';
         }
         else {
-          $form['admin']['nodes']['#options'][$nid]['yoast_seo'] = '';
+          $form['admin']['nodes']['#options'][$nid]['realtime_seo'] = '';
         }
       }
     }
@@ -495,8 +501,8 @@ function yoast_seo_form_node_admin_content_alter(&$form, &$form_state, $form_id)
  * @return array
  *   An array of SEO info data keyed by revision ID and language.
  */
-function yoast_seo_configuration_load($entity_type, $entity_id) {
-  $seo_info = yoast_seo_configuration_load_multiple($entity_type, array($entity_id));
+function realtime_seo_configuration_load($entity_type, $entity_id) {
+  $seo_info = realtime_seo_configuration_load_multiple($entity_type, array($entity_id));
   return !empty($seo_info) ? reset($seo_info) : array();
 }
 
@@ -509,9 +515,9 @@ function yoast_seo_configuration_load($entity_type, $entity_id) {
  * @return int
  *   An int representing the SEO score.
  */
-function yoast_seo_get_score($entity_id) {
+function realtime_seo_get_score($entity_id) {
   // Get the SEO score for this entity.
-  $result = db_select('yoast_seo', 'y')
+  $result = db_select('realtime_seo', 'y')
     ->fields('y', array(
       'seo_status',
     ))
@@ -531,7 +537,7 @@ function yoast_seo_get_score($entity_id) {
  * @return string
  *   A string that we can use as classname and automatically will be styled.
  */
-function yoast_seo_score_rating($score) {
+function realtime_seo_score_rating($score) {
   $score_rate = '';
 
   if ($score <= 4) {
@@ -564,22 +570,22 @@ function yoast_seo_score_rating($score) {
  * @return array
  *   An array of SEO info data, keyed by entity ID, revision ID and language.
  */
-function yoast_seo_configuration_load_multiple($entity_type, array $entity_ids, array $revision_ids = array()) {
+function realtime_seo_configuration_load_multiple($entity_type, array $entity_ids, array $revision_ids = array()) {
   // Double check entity IDs are numeric thanks to Entity API module.
   $entity_ids = array_filter($entity_ids, 'is_numeric');
   if (empty($entity_ids)) {
     return array();
   }
 
-  // Also need to check if the Yoast SEO table exists since this condition could
+  // Also need to check if the Realtime SEO table exists since this condition could
   // fire before the table has been installed yet.
-  if (!db_table_exists('yoast_seo')) {
-    watchdog('yoast_seo', 'The system tried to load Real-time SEO for Drupal data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
+  if (!db_table_exists('realtime_seo')) {
+    watchdog('realtime_seo', 'The system tried to load Real-time SEO for Backdrop data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
     return array();
   }
 
   // Get all translations of data for this entity.
-  $query = db_select('yoast_seo', 'y')
+  $query = db_select('realtime_seo', 'y')
     ->fields('y', array(
       'entity_id',
       'revision_id',
@@ -617,8 +623,8 @@ function yoast_seo_configuration_load_multiple($entity_type, array $entity_ids, 
 /**
  * Implements hook_entity_load().
  */
-function yoast_seo_entity_load($entities, $entity_type) {
-  if (yoast_seo_entity_supports_yoast_seo($entity_type)) {
+function realtime_seo_entity_load($entities, $entity_type) {
+  if (realtime_seo_entity_supports_realtime_seo($entity_type)) {
     // Get the revision_ids.
     $revision_ids = array();
 
@@ -632,8 +638,8 @@ function yoast_seo_entity_load($entities, $entity_type) {
     foreach ($entities as $key => $entity) {
       list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
 
-      // Verify that each entity bundle supports Yoast SEO.
-      if (yoast_seo_entity_supports_yoast_seo($entity_type, $bundle)) {
+      // Verify that each entity bundle supports Realtime SEO.
+      if (realtime_seo_entity_supports_realtime_seo($entity_type, $bundle)) {
         $entity_ids[] = $entity_id;
 
         if (!empty($revision_id)) {
@@ -646,14 +652,14 @@ function yoast_seo_entity_load($entities, $entity_type) {
     // entity doesn't support revisions anyway.
     if (!empty($entity_ids)) {
       // Load all SEO info for these entities.
-      $seo_info = yoast_seo_configuration_load_multiple($entity_type, $entity_ids, $revision_ids);
+      $seo_info = realtime_seo_configuration_load_multiple($entity_type, $entity_ids, $revision_ids);
 
       // Assign the metatag records for the correct revision ID.
       if (!empty($seo_info)) {
         foreach ($entities as $entity_id => $entity) {
           list($entity_id, $revision_id) = entity_extract_ids($entity_type, $entity);
           $revision_id = intval($revision_id);
-          $entities[$entity_id]->yoast_seo = isset($seo_info[$entity_id][$revision_id]) ? $seo_info[$entity_id][$revision_id] : array();
+          $entities[$entity_id]->realtime_seo = isset($seo_info[$entity_id][$revision_id]) ? $seo_info[$entity_id][$revision_id] : array();
         }
       }
     }
@@ -663,12 +669,12 @@ function yoast_seo_entity_load($entities, $entity_type) {
 /**
  * Implements hook_entity_insert().
  */
-function yoast_seo_entity_insert($entity, $entity_type) {
-  if (isset($entity->yoast_seo)) {
+function realtime_seo_entity_insert($entity, $entity_type) {
+  if (isset($entity->realtime_seo)) {
     list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
 
     // Verify that this entity type / bundle is supported.
-    if (!yoast_seo_entity_supports_yoast_seo($entity_type, $bundle)) {
+    if (!realtime_seo_entity_supports_realtime_seo($entity_type, $bundle)) {
       return;
     }
 
@@ -691,29 +697,29 @@ function yoast_seo_entity_insert($entity, $entity_type) {
 
     // Work-around for initial entity creation where a language was selection
     // but where it's different to the form's value.
-    if (!isset($entity->yoast_seo[$langcode]) && isset($entity->yoast_seo[LANGUAGE_NONE])) {
-      $entity->yoast_seo[$langcode] = $entity->yoast_seo[LANGUAGE_NONE];
-      unset($entity->yoast_seo[LANGUAGE_NONE]);
+    if (!isset($entity->realtime_seo[$langcode]) && isset($entity->realtime_seo[LANGUAGE_NONE])) {
+      $entity->realtime_seo[$langcode] = $entity->realtime_seo[LANGUAGE_NONE];
+      unset($entity->realtime_seo[LANGUAGE_NONE]);
     }
 
-    yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $entity->yoast_seo, $langcode);
+    realtime_seo_configuration_save($entity_type, $entity_id, $revision_id, $entity->realtime_seo, $langcode);
   }
 }
 
 /**
  * Implements hook_entity_update().
  */
-function yoast_seo_entity_update($entity, $entity_type) {
+function realtime_seo_entity_update($entity, $entity_type) {
   list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
 
   // If this entity object isn't allowed meta tags, don't continue.
-  if (!yoast_seo_entity_supports_yoast_seo($entity_type, $bundle)) {
+  if (!realtime_seo_entity_supports_realtime_seo($entity_type, $bundle)) {
     return;
   }
 
   $revision_id = intval($revision_id);
 
-  if (isset($entity->yoast_seo)) {
+  if (isset($entity->realtime_seo)) {
     // Determine the entity's new language. This will always be accurate as the
     // language value will already have been updated by the time this function
     // executes, and it will be loaded for the correct edit process.
@@ -739,7 +745,7 @@ function yoast_seo_entity_update($entity, $entity_type) {
         // to be done.
         if (!isset($entity->translation) || (isset($entity->translation) && !empty($entity->translation['created']))) {
           // Delete the old language record. This will not affect old revisions.
-          db_delete('yoast_seo')
+          db_delete('realtime_seo')
             ->condition('entity_type', $entity_type)
             ->condition('entity_id', $entity_id)
             ->condition('revision_id', $revision_id)
@@ -747,9 +753,9 @@ function yoast_seo_entity_update($entity, $entity_type) {
             ->execute();
 
           // Swap out the SEO values for the two languages.
-          if (isset($entity->yoast_seo[$old_language])) {
-            $entity->yoast_seo[$new_language] = $entity->yoast_seo[$old_language];
-            unset($entity->yoast_seo[$old_language]);
+          if (isset($entity->realtime_seo[$old_language])) {
+            $entity->realtime_seo[$new_language] = $entity->realtime_seo[$old_language];
+            unset($entity->realtime_seo[$old_language]);
           }
         }
       }
@@ -757,19 +763,19 @@ function yoast_seo_entity_update($entity, $entity_type) {
 
     // Save the record.
     $old_vid = isset($entity->old_vid) ? $entity->old_vid : NULL;
-    yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $entity->yoast_seo, $new_language, $old_vid);
+    realtime_seo_configuration_save($entity_type, $entity_id, $revision_id, $entity->realtime_seo, $new_language, $old_vid);
   }
 }
 
 /**
  * Implements hook_entity_delete().
  */
-function yoast_seo_entity_delete($entity, $type) {
+function realtime_seo_entity_delete($entity, $type) {
   // Currently we only support nodes, so checking for a node ID seems like a
   // good idea.
   if (!empty($entity->nid)) {
     // Delete the record from our table.
-    db_delete('yoast_seo')
+    db_delete('realtime_seo')
       ->condition('entity_type', $type)
       ->condition('entity_id', $entity->nid)
       ->execute();
@@ -792,7 +798,7 @@ function yoast_seo_entity_delete($entity, $type) {
  * @param int $old_vid
  *   (optional) The old revision.
  */
-function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $seo_info, $langcode, $old_vid = NULL) {
+function realtime_seo_configuration_save($entity_type, $entity_id, $revision_id, $seo_info, $langcode, $old_vid = NULL) {
   // If no language assigned, or the language doesn't exist, use the
   // has-no-language language.
   $languages = language_list();
@@ -816,7 +822,7 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
     $seo_info = array();
     // Add an empty array record for each language.
     $languages = db_query("SELECT language, ''
-        FROM {yoast_seo}
+        FROM {realtime_seo}
         WHERE (entity_type = :type)
         AND (entity_id = :id)
         AND (revision_id = :revision)",
@@ -835,7 +841,7 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
     // If the data array is empty, there is no data to actually save, so just
     // delete the record from the database.
     if (empty($new_seo_info)) {
-      db_delete('yoast_seo')
+      db_delete('realtime_seo')
         ->condition('entity_type', $entity_type)
         ->condition('entity_id', $entity_id)
         ->condition('revision_id', $revision_id)
@@ -844,7 +850,7 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
     }
     // Otherwise save the data for this entity.
     else {
-      db_merge('yoast_seo')
+      db_merge('realtime_seo')
         ->key(array(
           'entity_type' => $entity_type,
           'entity_id' => $entity_id,
@@ -865,8 +871,8 @@ function yoast_seo_configuration_save($entity_type, $entity_id, $revision_id, $s
  *
  * Remove configuration when the content type is removed.
  */
-function yoast_seo_node_type_delete($info) {
-  variable_del('yoast_seo_enable_node__' . $info->type);
+function realtime_seo_node_type_delete($info) {
+  variable_del('realtime_seo_enable_node__' . $info->type);
 }
 
 /**
@@ -874,13 +880,13 @@ function yoast_seo_node_type_delete($info) {
  *
  * Adds extra settings to the node content type edit page.
  */
-function yoast_seo_form_node_type_form_alter(&$form, $form_state) {
-  form_load_include($form_state, 'inc', 'yoast_seo', 'includes/yoast_seo.forms');
-  _yoast_seo_process_node_settings_form($form);
+function realtime_seo_form_node_type_form_alter(&$form, $form_state) {
+  form_load_include($form_state, 'inc', 'realtime_seo', 'includes/realtime_seo.forms');
+  _realtime_seo_process_node_settings_form($form);
 }
 
 /**
- * Check whether the requested entity type (and bundle) support Yoast SEO.
+ * Check whether the requested entity type (and bundle) support Realtime SEO.
  *
  * By default the entities are disabled, only certain entities will have been
  * enabled during installation. If an entity type is enabled it is assumed that
@@ -888,8 +894,8 @@ function yoast_seo_form_node_type_form_alter(&$form, $form_state) {
  *
  * @see metatag_entity_supports_metatags()
  */
-function yoast_seo_entity_supports_yoast_seo($entity_type = NULL, $bundle = NULL) {
-  $entity_types = &drupal_static(__FUNCTION__);
+function realtime_seo_entity_supports_realtime_seo($entity_type = NULL, $bundle = NULL) {
+  $entity_types = &backdrop_static(__FUNCTION__);
 
   // Identify which entities & bundles are supported the first time the
   // function is called.
@@ -907,7 +913,7 @@ function yoast_seo_entity_supports_yoast_seo($entity_type = NULL, $bundle = NULL
         // $conf['metatag_enable_file'] = FALSE;
         // .
         // @see Settings page.
-        if (variable_get('yoast_seo_enable_' . $entity_name, FALSE) == FALSE) {
+        if (variable_get('realtime_seo_enable_' . $entity_name, FALSE) == FALSE) {
           $entity_types[$entity_name] = FALSE;
         }
 
@@ -916,9 +922,9 @@ function yoast_seo_entity_supports_yoast_seo($entity_type = NULL, $bundle = NULL
           $entity_types[$entity_name] = array();
           foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
             // Allow bundles to be disabled by assigning a variable
-            // 'yoast_seo_enable_{$entity_type}__{$bundle}' the value FALSE,
+            // 'realtime_seo_enable_{$entity_type}__{$bundle}' the value FALSE,
             // e.g.:
-            if (variable_get('yoast_seo_enable_' . $entity_name . '__' . $bundle_name, TRUE) == FALSE) {
+            if (variable_get('realtime_seo_enable_' . $entity_name . '__' . $bundle_name, TRUE) == FALSE) {
               $entity_types[$entity_name][$bundle_name] = FALSE;
             }
             else {
@@ -958,18 +964,18 @@ function yoast_seo_entity_supports_yoast_seo($entity_type = NULL, $bundle = NULL
  * @param string $bundle
  *   The entity's bundle.
  */
-function yoast_seo_entity_type_enable($entity_type, $bundle = NULL) {
+function realtime_seo_entity_type_enable($entity_type, $bundle = NULL) {
   // The bundle was defined.
   if (isset($bundle)) {
-    variable_set('yoast_seo_enable_' . $entity_type . '__' . $bundle, TRUE);
+    variable_set('realtime_seo_enable_' . $entity_type . '__' . $bundle, TRUE);
   }
 
   // Always enable the entity type, because otherwise there's no point in
   // enabling the bundle.
-  variable_set('yoast_seo_enable_' . $entity_type, TRUE);
+  variable_set('realtime_seo_enable_' . $entity_type, TRUE);
 
   // Clear the static cache so that the entity type / bundle will work.
-  drupal_static_reset('yoast_seo_entity_supports_yoast_seo');
+  backdrop_static_reset('realtime_seo_entity_supports_realtime_seo');
 }
 
 /**
@@ -980,18 +986,18 @@ function yoast_seo_entity_type_enable($entity_type, $bundle = NULL) {
  * @param string $bundle
  *   The entity's bundle.
  */
-function yoast_seo_entity_type_disable($entity_type, $bundle = NULL) {
+function realtime_seo_entity_type_disable($entity_type, $bundle = NULL) {
   // The bundle was defined.
   if (isset($bundle)) {
-    variable_set('yoast_seo_enable_' . $entity_type . '__' . $bundle, FALSE);
+    variable_set('realtime_seo_enable_' . $entity_type . '__' . $bundle, FALSE);
   }
   // The bundle was not defined.
   else {
-    variable_set('yoast_seo_enable_' . $entity_type, FALSE);
+    variable_set('realtime_seo_enable_' . $entity_type, FALSE);
   }
 
   // Clear the static cache so that the entity type / bundle will work.
-  drupal_static_reset('yoast_seo_entity_supports_yoast_seo');
+  backdrop_static_reset('realtime_seo_entity_supports_realtime_seo');
 }
 
 /**
@@ -1003,8 +1009,8 @@ function yoast_seo_entity_type_disable($entity_type, $bundle = NULL) {
  * @return string
  *   Generated path to the library in the mode that was requested.
  */
-function yoast_seo_library_path($library = 'js-text-analysis', $mode = 'relative') {
-  $lib_path = drupal_get_path('module', 'yoast_seo') . '/js';
+function realtime_seo_library_path($library = 'js-text-analysis', $mode = 'relative') {
+  $lib_path = backdrop_get_path('module', 'realtime_seo') . '/js';
 
   if ($mode == 'local') {
     return './' . $lib_path . '/' . $library;

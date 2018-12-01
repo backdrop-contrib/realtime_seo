@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks provided by the Yoast SEO for Drupal module.
+ * Hooks provided by the Realtime SEO for Backdrop module.
  */
 
 /**
@@ -12,5 +12,5 @@
  *   The array containing all the configuration options needed to let the
  *   content analysis library work it's magic.
  */
-function hook_yoast_seo_configuration_alter(&$configuration) {
+function hook_realtime_seo_configuration_alter(&$configuration) {
 }

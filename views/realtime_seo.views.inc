@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Views definitions for yoast_seo.
+ * Views definitions for realtime_seo.
  */
 
 /**
  * Implements hook_views_data().
  */
-function yoast_seo_views_data() {
+function realtime_seo_views_data() {
   $data = array();
 
-  $data['yoast_seo'] = array(
+  $data['realtime_seo'] = array(
     'table' => array(
-      'group' => t('Yoast SEO'),
+      'group' => t('Realtime SEO'),
       'base' => array(
         'field' => 'entity_id',
         'title' => t('Entity ID'),
@@ -68,7 +68,7 @@ function yoast_seo_views_data() {
       'title' => t('SEO Rating'),
       'help' => t('Real-time SEO Rating represented using a traffic light system.'),
       'field' => array(
-        'handler' => 'yoast_seo_handler_rating',
+        'handler' => 'realtime_seo_handler_rating',
       ),
     ),
   );

@@ -5,9 +5,9 @@
  */
 
 /**
- * View handler class yoast_seo_handler_rating.
+ * View handler class realtime_seo_handler_rating.
  */
-class yoast_seo_handler_rating extends views_handler_field {
+class realtime_seo_handler_rating extends views_handler_field {
 
   /**
    * @inheritdoc
@@ -22,20 +22,20 @@ class yoast_seo_handler_rating extends views_handler_field {
   public function render($values) {
     $output = '';
 
-    if (user_access('use yoast seo')) {
+    if (user_access('use realtime seo')) {
       // Add our own CSS.
-      drupal_add_css(drupal_get_path('module', 'yoast_seo') . '/css/yoast_seo.css');
+      backdrop_add_css(backdrop_get_path('module', 'realtime_seo') . '/css/realtime_seo.css');
 
       // Check if entity has SEO availability otherwise show a message.
-      if (yoast_seo_entity_supports_yoast_seo('node', strtolower($values->node_type))) {
+      if (realtime_seo_entity_supports_realtime_seo('node', strtolower($values->node_type))) {
         // Score will be either 0 or a higher int. 0 is default.
-        $score = yoast_seo_get_score($values->nid);
+        $score = realtime_seo_get_score($values->nid);
         // Class will represent classname for current score. Like poor or bad
         // it's used for theming purposes.
-        $class = yoast_seo_score_rating($score);
+        $class = realtime_seo_score_rating($score);
 
         // Add Yoast score to the overview.
-        $output = '<div id="yoast-overallscore" class="overallScore ' . $class . '"><div class="score_circle"></div></div>';
+        $output = '<div id="realtime-overallscore" class="overallScore ' . $class . '"><div class="score_circle"></div></div>';
       }
       else {
         $output = '';

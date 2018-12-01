@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Administration page callbacks for the Yoast SEO for Drupal module.
+ * Administration page callbacks for the Realtime SEO for Backdrop module.
  */
 
 /**
  * Main settings page.
  */
-function yoast_seo_admin_settings_form() {
+function realtime_seo_admin_settings_form() {
   $form = array();
 
   // Check if XML Sitemap is installed and enabled.
@@ -25,7 +25,7 @@ function yoast_seo_admin_settings_form() {
   else {
     // XML Sitemap is not enabled, inform the user he should think about
     // installing and enabling it.
-    $xmlsitemap_description = t('You currently do not have XML Sitemap enabled. We strongly recommend you to install XML Sitemap. You can download the module from <a href="@project-page-url">@project-page-url</a>.', array('@project-page-url' => 'https://www.drupal.org/project/xmlsitemap'));
+    $xmlsitemap_description = t('You currently do not have XML Sitemap enabled. We strongly recommend you to install XML Sitemap. You can download the module from <a href="@project-page-url">@project-page-url</a>.', array('@project-page-url' => 'https://backdropcms.org/project/xmlsitemap'));
   }
 
   $form['xmlsitemap'] = array(
@@ -52,11 +52,11 @@ function yoast_seo_admin_settings_form() {
 
   // Allow the Real-Time SEO Module to be displayed in a tab at the bottom of
   // the edit page.
-  $form['yoast_seo_vertical_tab'] = array(
+  $form['realtime_seo_vertical_tab'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display in vertical tab'),
     '#description' => t('Put Real-Time SEO Module in a vertical tab on content edit forms.'),
-    '#default_value' => variable_get('yoast_seo_vertical_tab', FALSE),
+    '#default_value' => variable_get('realtime_seo_vertical_tab', FALSE),
   );
 
   // Let Drupal save our checkbox as a system variable.

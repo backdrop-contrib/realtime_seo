@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Install, update, and uninstall functions for the Yoast SEO for Drupal module.
+ * Install, update, and uninstall functions for the Backdrop SEO for Backdrop module.
  */
 
 /**
  * Implements hook_schema().
  */
-function yoast_seo_schema() {
-  $schema['yoast_seo'] = array(
+function realtime_seo_schema() {
+  $schema['realtime_seo'] = array(
     'fields' => array(
       'entity_type' => array(
         'type' => 'varchar',
@@ -70,20 +70,20 @@ function yoast_seo_schema() {
  *
  * @see metatag_install()
  */
-function yoast_seo_install() {
+function realtime_seo_install() {
   $entity_type = 'node';
 
   // Always enable the node entity.
-  variable_set('yoast_seo_enable_' . $entity_type, TRUE);
+  variable_set('realtime_seo_enable_' . $entity_type, TRUE);
 
   // Update each entity bundle too.
   $entity_info = entity_get_info($entity_type);
   if (!empty($entity_info['bundles'])) {
     foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
       $fields = field_info_instances($entity_type, $bundle_name);
-      $variable_name = 'yoast_seo_enable_' . $entity_type . '__' . $bundle_name;
+      $variable_name = 'realtime_seo_enable_' . $entity_type . '__' . $bundle_name;
 
-      // Enable Yoast SEO for Drupal when the body field is present.
+      // Enable Realtime SEO for Backdrop when the body field is present.
       if (isset($fields['body'])) {
         variable_set($variable_name, TRUE);
       }
@@ -97,30 +97,18 @@ function yoast_seo_install() {
 /**
  * Implements hook_uninstall().
  */
-function yoast_seo_uninstall() {
+function realtime_seo_uninstall() {
   $entity_type = 'node';
 
   // Delete node entity variable.
-  variable_del('yoast_seo_enable_' . $entity_type);
+  variable_del('realtime_seo_enable_' . $entity_type);
 
   // Also delete the variable for each entity bundle.
   $entity_info = entity_get_info($entity_type);
   if (!empty($entity_info['bundles'])) {
     foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
-      variable_del('yoast_seo_enable_' . $entity_type . '__' . $bundle_name);
-      variable_del('yoast_seo_body_fields_' . $bundle_name);
+      variable_del('realtime_seo_enable_' . $entity_type . '__' . $bundle_name);
+      variable_del('realtime_seo_body_fields_' . $bundle_name);
     }
   }
-}
-
-/**
- * Change yoast_seo field scheme type from 'int' to 'float'.
- */
-function yoast_seo_update_7000() {
-  db_drop_primary_key('yoast_seo');
-  db_change_field('yoast_seo', 'seo_status', 'seo_status',
-    array(
-      'type' => 'float',
-      'unsigned' => FALSE,
-    ));
 }

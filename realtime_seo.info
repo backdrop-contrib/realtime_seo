@@ -1,4 +1,4 @@
-name = Real-time SEO for Drupal
+name = Real-time SEO for Backdrop
 description = "Adds Real-time SEO page analysis and configuration"
 type = module
 package = SEO
@@ -7,12 +7,8 @@ backdrop = 1.x
 ; These are provided by core.
 dependencies[] = node
 dependencies[] = path
-;dependencies[] = ctools
 
 ; A newer version of Metatag is required due to internal API changes.
 dependencies[] = metatag (>= 1.7)
 
-configure = admin/config/search/yoast
-
-; Views Handlers.
-files[] = views/yoast_seo_handler_rating.inc
+configure = admin/config/search/realtime

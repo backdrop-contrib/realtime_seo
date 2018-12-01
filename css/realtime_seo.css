@@ -324,7 +324,7 @@
   vertical-align: top;
 }
 
-.yoast-seo-form.form-wrapper {
+.realtime-seo-form.form-wrapper {
   border: 1px solid #ccc;
   padding: 10px;
   background-color: #fdfdfd;
@@ -373,11 +373,11 @@ li.score {
   border-radius: 50%;
   vertical-align: top;
 }
-#yoast-overallscore {
+#realtime-overallscore {
   display: inline-block;
   vertical-align: -5px;
 }
-div.form-item-yoast-seo-und-focus-keyword {
+div.form-item-realtime-seo-und-focus-keyword {
   display: inline-block;
   vertical-align: middle;
 }
